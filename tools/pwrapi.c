@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #include "pwr.h"
 
@@ -25,8 +25,8 @@ void get_type_objects( PWR_Obj obj, PWR_ObjType type, PWR_Grp outGroup )
     unsigned int i;
     size_t size;
     PWR_Grp cgrp;
-	PWR_ObjType objType;
-	PWR_ObjGetType( obj, &objType );
+    PWR_ObjType objType;
+    PWR_ObjGetType( obj, &objType );
 
     if( objType == type ) {
         if( PWR_GrpAddObj( outGroup, obj ) == PWR_RET_FAILURE ) {
@@ -35,26 +35,26 @@ void get_type_objects( PWR_Obj obj, PWR_ObjType type, PWR_Grp outGroup )
         }
     }
 
-	int rc = PWR_ObjGetChildren( obj, &cgrp );
-    if ( PWR_RET_SUCCESS != rc ) {  
+    int rc = PWR_ObjGetChildren( obj, &cgrp );
+    if ( PWR_RET_SUCCESS != rc ) {
         printf( "Error: failed\n" );
-		return;
+        return;
     }
-	if ( NULL == cgrp ) {
-		return;
-	}
+    if ( NULL == cgrp ) {
+        return;
+    }
 
     size = PWR_GrpGetNumObjs( cgrp );
     for( i = 0; i < size; i++ ) {
-		PWR_Obj tmp;
-		PWR_GrpGetObjByIndx( cgrp, i, &tmp), 
-        get_type_objects( tmp, type, outGroup );
+        PWR_Obj tmp;
+        PWR_GrpGetObjByIndx( cgrp, i, &tmp),
+            get_type_objects( tmp, type, outGroup );
     }
 }
 
 int main( int argc, char* argv[] )
 {
-	int rc;
+    int rc;
     PWR_Obj self;
     PWR_Cntxt cntxt;
     PWR_Grp grp;
@@ -68,7 +68,7 @@ int main( int argc, char* argv[] )
     unsigned int i, j, k, samples = 1, freq = 1, numobjs = 0, numattrs = 0;
     PWR_ObjType type = PWR_OBJ_SOCKET;
 
-    PWR_AttrAccessError error; 
+    PWR_AttrAccessError error;
     PWR_AttrName attrs[100];
     PWR_Time *vals_ts = 0x0;
     double *vals = 0x0;
@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
                     default:
                         printf( "Error: unsupported attribute type (try E P F T M V C)\n" );
                         return -1;
-                } 
+                }
                 break;
             case 't':
                 switch( optarg[0] ) {
@@ -151,21 +151,21 @@ int main( int argc, char* argv[] )
     if ( PWR_OBJ_INVALID == type || 0 == numattrs ) {
         fprintf( stderr, usage, argv[0] );
         exit( 1 );
-    } 
+    }
 
-	rc = PWR_CntxtInit(PWR_CNTXT_DEFAULT, PWR_ROLE_APP, "Application", &cntxt);
+    rc = PWR_CntxtInit(PWR_CNTXT_DEFAULT, PWR_ROLE_APP, "Application", &cntxt);
     if( PWR_RET_SUCCESS != rc ) {
         printf( "Error: initialization of PowerAPI context failed\n" );
         return -1;
     }
 
-	rc = PWR_CntxtGetEntryPoint( cntxt, &self ) ;
+    rc = PWR_CntxtGetEntryPoint( cntxt, &self ) ;
     if( PWR_RET_SUCCESS != rc ) {
         printf( "Error: getting self from PowerAPI context failed\n" );
         return -1;
     }
 
-	rc = PWR_GrpCreate( cntxt, &grp );
+    rc = PWR_GrpCreate( cntxt, &grp );
     if( PWR_RET_SUCCESS != rc ) {
         printf( "Error: creating a group from PowerAPI failed\n" );
         return -1;
@@ -180,17 +180,17 @@ int main( int argc, char* argv[] )
     vals = malloc( numobjs * numattrs * sizeof(double) );
 
     PWR_Status stats;
-	PWR_StatusCreate( &stats );
+    PWR_StatusCreate( &stats );
     for( i = 0; i < samples; i++ ) {
         gettimeofday( &t0, 0x0 );
 
-        if( PWR_GrpAttrGetValues( grp, numattrs, attrs, vals, vals_ts, stats ) 
+        if( PWR_GrpAttrGetValues( grp, numattrs, attrs, vals, vals_ts, stats )
                 == PWR_RET_SUCCESS ) {
             for( j = 0; j < numobjs; j++ ) {
-				char name[100]; 
-				PWR_Obj obj;
-				PWR_GrpGetObjByIndx( grp, j, &obj ), 
-				PWR_ObjGetName( obj, name, 100 );
+                char name[100];
+                PWR_Obj obj;
+                PWR_GrpGetObjByIndx( grp, j, &obj ),
+                    PWR_ObjGetName( obj, name, 100 );
                 printf( "%s: ", name );
 
                 for( k = 0; k < numattrs; k++ ) {
@@ -215,8 +215,8 @@ int main( int argc, char* argv[] )
                     usleep( 1000000.0 / freq - tdiff );
             }
         } else {
-            PWR_StatusPopError( stats, &error );  
-			char name[100];
+            PWR_StatusPopError( stats, &error );
+            char name[100];
             PWR_ObjGetName(error.obj, name, 100 );
             printf("Error: reading of `%s` failed for object `%s` with error %d\n",
                     PWR_AttrGetTypeString( error.name), name, error.error );
