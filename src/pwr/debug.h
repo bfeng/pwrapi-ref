@@ -25,7 +25,6 @@ extern unsigned int _DbgFlags;
 #define DBG_EC2 (1<<3)
 #define DBG_PLUGGIN (1<<4)
 
-#define USE_DEBUG
 #ifdef USE_DEBUG
 
 #ifndef gettid
