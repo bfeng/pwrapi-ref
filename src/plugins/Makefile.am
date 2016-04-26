@@ -4,7 +4,8 @@ lib_LTLIBRARIES =	libpwr_rapldev.la \
 			libpwr_pmcdev.la \
 			libpwr_wudev.la \
 			libpwr_cpudev.la \
-			libdummy_dev.la
+			libdummy_dev.la \
+			librnet_dev.la
 
 # Power API Plugins
 if HAVE_POWERGADGET
@@ -59,4 +60,7 @@ libdummy_dev_la_SOURCES = pwr_dev.c dummy_dev.c
 libdummy_dev_la_CFLAGS = -I$(top_srcdir)/src/pwr
 libdummy_dev_la_LDFLAGS = -version-info 1:0:1
 
+librnet_dev_la_SOURCES = pwr_dev.c rnet_dev.c
+librnet_dev_la_CFLAGS = -I$(top_srcdir)/src/pwr
+librnet_dev_la_LDFLAGS = -version-info 1:0:1
 
