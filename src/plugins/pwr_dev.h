@@ -7,10 +7,10 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
-#ifndef PWR_DEV_H 
-#define PWR_DEV_H 
+#ifndef PWR_DEV_H
+#define PWR_DEV_H
 
 #include "pwrdev.h"
 #include "pwr_config.h"
@@ -22,8 +22,8 @@
 extern "C" {
 #endif
 
-int pwr_dev_log_start( pwr_fd_t fd, PWR_AttrName name );
-int pwr_dev_log_stop( pwr_fd_t fd, PWR_AttrName name );
+	int pwr_dev_log_start( pwr_fd_t fd, PWR_AttrName name );
+	int pwr_dev_log_stop( pwr_fd_t fd, PWR_AttrName name );
 
 #ifdef __cplusplus
 }
