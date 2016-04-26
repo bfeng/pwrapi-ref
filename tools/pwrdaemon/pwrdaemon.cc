@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #include <sys/types.h>
 #include <signal.h>
@@ -45,15 +45,15 @@ int main( int argc, char* argv[] )
 	pthread_t lgrThread = 0;
 
 	std::deque<pthread_t> srvrThreads;
-	
+
 	rtrArgs.argv.push_back( argv[0] );
 	findArgs( "rtr", argc, argv, rtrArgs );
 	pthread_mutex_init(&mutex,NULL);
 
 	if ( rtrArgs.argv.size() > 2 ) {
-		rc = pthread_mutex_lock(&mutex);	
+		rc = pthread_mutex_lock(&mutex);
 		assert(0==rc);
-		rc = pthread_create( &rtrThread, NULL, startRtrThread, &rtrArgs );  
+		rc = pthread_create( &rtrThread, NULL, startRtrThread, &rtrArgs );
 		assert(0==rc);
 	}
 
@@ -67,17 +67,17 @@ int main( int argc, char* argv[] )
 		if ( count > -1 ) {
 			std::ostringstream convert;
 			convert << count;
-			tmp += convert.str(); 
+			tmp += convert.str();
 		}
 
 		findArgs( tmp , argc, argv, srvrArgs );
 
 		if ( srvrArgs.argv.size() > 2 ) {
-			
+
 			srvrThreads.resize( srvrThreads.size() + 1 );
-			rc = pthread_mutex_lock(&mutex);	
+			rc = pthread_mutex_lock(&mutex);
 			assert(0==rc);
-			rc = pthread_create( &srvrThreads.back(), NULL, startSrvrThread, &srvrArgs );  
+			rc = pthread_create( &srvrThreads.back(), NULL, startSrvrThread, &srvrArgs );
 			assert(0==rc);
 		} else {
 			delete &srvrArgs;
@@ -85,24 +85,24 @@ int main( int argc, char* argv[] )
 		}
 
 		++count;
-	} 
+	}
 
 	lgrArgs.argv.push_back( argv[0] );
 	findArgs( "lgr", argc, argv, lgrArgs );
 
 	if ( lgrArgs.argv.size() > 2 ) {
-		rc = pthread_mutex_lock(&mutex);	
+		rc = pthread_mutex_lock(&mutex);
 		assert(0==rc);
-		rc = pthread_create( &lgrThread, NULL, startLgrThread, &lgrArgs );  
+		rc = pthread_create( &lgrThread, NULL, startLgrThread, &lgrArgs );
 		assert(0==rc);
 	}
 
-	rc = pthread_mutex_lock(&mutex);	
+	rc = pthread_mutex_lock(&mutex);
 	assert(0==rc);
 
-    if ( getenv( "POWERRT_SIGNAL" ) ) {
-	    kill(getppid(),SIGUSR1);
-    }
+	if ( getenv( "POWERRT_SIGNAL" ) ) {
+		kill(getppid(),SIGUSR1);
+	}
 
 	while ( srvrThreads.size() ) {
 		//printf("wait for server thread to exit\n");
@@ -129,7 +129,7 @@ void* startRtrThread( void * _args)
 
 	PWR_Router::Router rtr(args.argc, &args.argv[0] );
 
-	int rc = pthread_mutex_unlock(&mutex);	
+	int rc = pthread_mutex_unlock(&mutex);
 	assert(0==rc);
 
 	return (void*) (unsigned long)rtr.work();
@@ -143,7 +143,7 @@ void* startSrvrThread( void * _args)
 
 	PWR_Server::Server srvr(args.argc, &args.argv[0] );
 
-	int rc = pthread_mutex_unlock(&mutex);	
+	int rc = pthread_mutex_unlock(&mutex);
 	assert(0==rc);
 
 	return (void*) (unsigned long)srvr.work();
@@ -157,7 +157,7 @@ void* startLgrThread( void * _args)
 
 	PWR_Logger::Logger logger(args.argc, &args.argv[0] );
 
-	int rc = pthread_mutex_unlock(&mutex);	
+	int rc = pthread_mutex_unlock(&mutex);
 	assert(0==rc);
 
 	return (void*) (unsigned long)logger.work();
@@ -174,7 +174,7 @@ void findArgs( std::string prefix, int argc, char* argv[], Args& args )
 
 			//printf("'%s' -> ",argv[i]);
 			memset( argv[i], '-', len );
-			
+
 			char *p = argv[i] + ( len - 2 );
 			//printf("'%s'\n",p);
 			args.argv.push_back( p );

@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #include "router.h"
 
@@ -18,25 +18,25 @@ Router::Client::Client( Router& rtr ) :m_rtr(rtr) {
 }
 Router::Client::~Client() {
 	DBGX("\n");
-    std::map<CommID,CommCreateEvent* >::iterator iter;
-    for ( iter = m_commMap.begin(); iter != m_commMap.end(); ++iter ) {
+	std::map<CommID,CommCreateEvent* >::iterator iter;
+	for ( iter = m_commMap.begin(); iter != m_commMap.end(); ++iter ) {
 
-   		CommCreateEvent* ev = iter->second;
-        for ( unsigned int i = 0; i < ev->members[0].size(); i++ ) {
-            DBGX("%s\n", ev->members[0][i].c_str() );
-            CommDestroyEvent* d_ev = new CommDestroyEvent;
-            d_ev->commID = ev->commID;
-            m_rtr.sendEvent( ev->members[0][i].c_str(), d_ev );
-            delete d_ev;
-        }
+		CommCreateEvent* ev = iter->second;
+		for ( unsigned int i = 0; i < ev->members[0].size(); i++ ) {
+			DBGX("%s\n", ev->members[0][i].c_str() );
+			CommDestroyEvent* d_ev = new CommDestroyEvent;
+			d_ev->commID = ev->commID;
+			m_rtr.sendEvent( ev->members[0][i].c_str(), d_ev );
+			delete d_ev;
+		}
 
-        delete ev;
-   }
+		delete ev;
+	}
 }
 
 void Router::Client::addComm( CommID id, CommCreateEvent* ev ) {
 	assert( m_commMap.find( id ) == m_commMap.end() );
-    m_commMap[id] = ev;
+	m_commMap[id] = ev;
 }
 
 std::vector< std::vector< ObjID > >& Router::Client::getCommList( CommID id ) {

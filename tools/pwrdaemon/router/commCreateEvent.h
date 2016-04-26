@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _RTR_COMM_CREATE_EVENT_H
 #define _RTR_COMM_CREATE_EVENT_H
@@ -17,12 +17,12 @@
 
 namespace PWR_Router {
 
-class RtrCommCreateEvent: public  CommCreateEvent {
-  public:
-   	RtrCommCreateEvent( SerialBuf& buf ) : CommCreateEvent( buf ) {}  
+	class RtrCommCreateEvent: public  CommCreateEvent {
+		public:
+			RtrCommCreateEvent( SerialBuf& buf ) : CommCreateEvent( buf ) {}
 
-	bool process( EventGenerator* _rtr, EventChannel* ec );
-};
+			bool process( EventGenerator* _rtr, EventChannel* ec );
+	};
 
 }
 

@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #define USE_SYSTIME
 
@@ -194,7 +194,7 @@ static int rapldev_parse_open( const char *openstr, layer_t *layer )
         fprintf( stderr, "Error: unknown layer specification in open string %s\n", openstr );
         return -1;
     }
- 
+
     DBGP( "Info: extracted open string (layer=%d)\n", *layer );
 
     return 0;
@@ -262,13 +262,13 @@ static int rapldev_read( int fd, int offset, long long *msr )
         fprintf( stderr, "Error: RAPL read failed\n" );
         return -1;
     }
- 
+
     *msr = (long long)value;
     return 0;
 }
 
 static int rapldev_gather( int fd, int cpu_model, layer_t layer, units_t units,
-                           double *energy, double *time, int *policy )
+        double *energy, double *time, int *policy )
 {
     long long msr;
 
@@ -280,7 +280,7 @@ static int rapldev_gather( int fd, int cpu_model, layer_t layer, units_t units,
         *energy = (double)msr * units.energy;
 
         if( cpu_model == CPU_MODEL_SANDY_EP ||
-            cpu_model == CPU_MODEL_IVY_EP ) {
+                cpu_model == CPU_MODEL_IVY_EP ) {
             if( rapldev_read( fd, MSR_PERF_STATUS, &msr ) < 0 ) {
                 fprintf( stderr, "Error: PWR RAPL device read failed\n" );
                 return -1;
@@ -302,7 +302,7 @@ static int rapldev_gather( int fd, int cpu_model, layer_t layer, units_t units,
         *policy = (int)(MSR(msr, PP0_POLICY_SHIFT, PP0_POLICY_MASK));
 
         if( cpu_model == CPU_MODEL_SANDY_EP ||
-            cpu_model == CPU_MODEL_IVY_EP ) {
+                cpu_model == CPU_MODEL_IVY_EP ) {
             if( rapldev_read( fd, MSR_PP0_PERF_STATUS, &msr ) < 0 ) {
                 fprintf( stderr, "Error: PWR RAPL device read failed\n" );
                 return -1;
@@ -312,8 +312,8 @@ static int rapldev_gather( int fd, int cpu_model, layer_t layer, units_t units,
     }
     else if( layer == INTEL_LAYER_PP1 ) {
         if( cpu_model == CPU_MODEL_SANDY  ||
-            cpu_model == CPU_MODEL_IVY    ||
-            cpu_model == CPU_MODEL_HASWELL ) {
+                cpu_model == CPU_MODEL_IVY    ||
+                cpu_model == CPU_MODEL_HASWELL ) {
             if( rapldev_read( fd, MSR_PP1_ENERGY_STATUS, &msr ) < 0 ) {
                 fprintf( stderr, "Error: PWR RAPL device read failed\n" );
                 return -1;
@@ -371,9 +371,9 @@ plugin_devops_t *pwr_rapldev_init( const char *initstr )
         fprintf( stderr, "Error: PWR RAPL device read failed\n" );
         return 0x0;
     }
-    PWR_RAPLDEV(dev->private_data)->units.power = 
+    PWR_RAPLDEV(dev->private_data)->units.power =
         pow( 0.5, (double)(MSR(msr, POWER_UNITS_SHIFT, POWER_UNITS_MASK)) );
-    PWR_RAPLDEV(dev->private_data)->units.energy = 
+    PWR_RAPLDEV(dev->private_data)->units.energy =
         pow( 0.5, (double)(MSR(msr, ENERGY_UNITS_SHIFT, ENERGY_UNITS_MASK)) );
     PWR_RAPLDEV(dev->private_data)->units.time =
         pow( 0.5, (double)(MSR(msr, TIME_UNITS_SHIFT, TIME_UNITS_MASK)) );
@@ -420,7 +420,7 @@ plugin_devops_t *pwr_rapldev_init( const char *initstr )
         (unsigned short)(MSR_BIT(msr, ENABLED2_LIMIT_BIT));
     PWR_RAPLDEV(dev->private_data)->limit.clamped2 =
         (unsigned short)(MSR_BIT(msr, CLAMPED2_LIMIT_BIT));
- 
+
     DBGP( "Info: limit.power1   - %g\n", PWR_RAPLDEV(dev->private_data)->limit.power1 );
     DBGP( "Info: limit.window1  - %g\n", PWR_RAPLDEV(dev->private_data)->limit.window1 );
     DBGP( "Info: limit.enabled1 - %u\n", PWR_RAPLDEV(dev->private_data)->limit.enabled1 );
@@ -482,10 +482,10 @@ int pwr_rapldev_read( pwr_fd_t fd, PWR_AttrName attr, void *value, unsigned int 
     }
 
     if( rapldev_gather( (PWR_RAPLFD(fd)->dev)->fd,
-                        (PWR_RAPLFD(fd)->dev)->cpu_model,
-                        PWR_RAPLFD(fd)->layer,
-                        (PWR_RAPLFD(fd)->dev)->units,
-                        &energy, &time, &policy ) < 0 ) {
+                (PWR_RAPLFD(fd)->dev)->cpu_model,
+                PWR_RAPLFD(fd)->layer,
+                (PWR_RAPLFD(fd)->dev)->units,
+                &energy, &time, &policy ) < 0 ) {
         fprintf( stderr, "Error: PWR RAPL device gather failed\n" );
         return -1;
     }
@@ -502,8 +502,8 @@ int pwr_rapldev_read( pwr_fd_t fd, PWR_AttrName attr, void *value, unsigned int 
     gettimeofday( &tv, NULL );
     *timestamp = tv.tv_sec*1000000000ULL + tv.tv_usec*1000;
 #else
-    *timestamp = (unsigned int)time*1000000000ULL + 
-                 (time-(unsigned int)time)*1000000000ULL;
+    *timestamp = (unsigned int)time*1000000000ULL +
+        (time-(unsigned int)time)*1000000000ULL;
 #endif
 
     return 0;
@@ -515,7 +515,7 @@ int pwr_rapldev_write( pwr_fd_t fd, PWR_AttrName attr, void *value, unsigned int
 }
 
 int pwr_rapldev_readv( pwr_fd_t fd, unsigned int arraysize,
-    const PWR_AttrName attrs[], void *values, PWR_Time timestamp[], int status[] )
+        const PWR_AttrName attrs[], void *values, PWR_Time timestamp[], int status[] )
 {
     unsigned int i;
 
@@ -526,7 +526,7 @@ int pwr_rapldev_readv( pwr_fd_t fd, unsigned int arraysize,
 }
 
 int pwr_rapldev_writev( pwr_fd_t fd, unsigned int arraysize,
-    const PWR_AttrName attrs[], void *values, int status[] )
+        const PWR_AttrName attrs[], void *values, int status[] )
 {
     unsigned int i;
 
