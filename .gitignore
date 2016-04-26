@@ -22,3 +22,4 @@ config/ltversion.m4
 config/lt~obsolete.m4
 config/missing
 config/py-compile
+src/stamp-h1
