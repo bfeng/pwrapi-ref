@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _RTR_SERVER_EVENTS_H
 #define _RTR_SERVER_EVENTS_H
@@ -19,20 +19,22 @@
 
 namespace PWR_Router {
 
-class RtrServerConnectEvent: public  ServerConnectEvent {
-  public:
-   	RtrServerConnectEvent( SerialBuf& buf ) : ServerConnectEvent( buf ) {}  
+    class RtrServerConnectEvent : public ServerConnectEvent {
+    public:
 
-	bool process( EventGenerator* _rtr, EventChannel* ec ) {
-        Router& rtr = *static_cast<Router*>(_rtr);
-		ServerID id = rtr.addServer( name, ec );
+        RtrServerConnectEvent(SerialBuf& buf) : ServerConnectEvent(buf) {
+        }
 
-		rtr.doPending( id );
-//        Router::Server& server = *rtr.getServer( ec );
-		DBGX("%s\n",name.c_str());
-		return true;
-	}
-};
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+            Router& rtr = *static_cast<Router*> (_rtr);
+            ServerID id = rtr.addServer(name, ec);
+
+            rtr.doPending(id);
+            //        Router::Server& server = *rtr.getServer( ec );
+            DBGX("%s\n", name.c_str());
+            return true;
+        }
+    };
 
 }
 

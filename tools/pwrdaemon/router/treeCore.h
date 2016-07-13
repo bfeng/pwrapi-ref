@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _TREE_CORE_H
 #define _TREE_CORE_H
@@ -20,37 +20,40 @@
 
 namespace PWR_Router {
 
-class Router;
+    class Router;
 
-struct Link {
-	std::string myListenPort;
-	std::string otherHost;
-	std::string otherHostListenPort;
-	std::string nidStart;
-	std::string nidStop;
-};
-
-struct TreeArgs : public RouterCoreArgs {
-	std::vector<Link> links;
-};
-
-class TreeCore : public RouterCore {
-   	struct ABC {
-		ABC() : send(NULL), recv(NULL), nidStart(0), nidStop(0) {}
-        EventChannel* send;
-        EventChannel* recv;
-		unsigned nidStart;
-		unsigned nidStop;
+    struct Link {
+        std::string myListenPort;
+        std::string otherHost;
+        std::string otherHostListenPort;
+        std::string nidStart;
+        std::string nidStop;
     };
 
-  public:
-	TreeCore( RouterCoreArgs*, Router* ); 
-	
-	EventChannel* getChannel( RouterID id );
+    struct TreeArgs : public RouterCoreArgs {
+        std::vector<Link> links;
+    };
 
-  private:
-    std::vector< ABC  >   m_rtrLinks;
-};
+    class TreeCore : public RouterCore {
+
+        struct ABC {
+
+            ABC() : send(NULL), recv(NULL), nidStart(0), nidStop(0) {
+            }
+            EventChannel* send;
+            EventChannel* recv;
+            unsigned nidStart;
+            unsigned nidStop;
+        };
+
+    public:
+        TreeCore(RouterCoreArgs*, Router*);
+
+        EventChannel* getChannel(RouterID id);
+
+    private:
+        std::vector< ABC > m_rtrLinks;
+    };
 
 }
 

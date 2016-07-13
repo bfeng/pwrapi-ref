@@ -13,78 +13,79 @@
 
 namespace PWR_Server {
 
-static void getSamplesFini( void* );
+    static void getSamplesFini(void*);
 
-class SrvrCommGetSamplesReqEvent: public  CommGetSamplesReqEvent {
-  public:
-   	SrvrCommGetSamplesReqEvent( SerialBuf& buf ) : 
-		CommGetSamplesReqEvent( buf ), m_req(NULL) {}  
+    class SrvrCommGetSamplesReqEvent : public CommGetSamplesReqEvent {
+    public:
 
-   	~SrvrCommGetSamplesReqEvent( ) {
-		DBGX("\n");
-		if ( m_req ) {
-			PWR_ReqDestroy( m_req );
-		}
-	}
+        SrvrCommGetSamplesReqEvent(SerialBuf& buf) :
+        CommGetSamplesReqEvent(buf), m_req(NULL) {
+        }
 
-	bool process( EventGenerator* gen, EventChannel* ) {
-		m_info = static_cast<Server*>(gen);
+        ~SrvrCommGetSamplesReqEvent() {
+            DBGX("\n");
+            if (m_req) {
+                PWR_ReqDestroy(m_req);
+            }
+        }
 
-    	PWR_Obj obj = m_info->m_commMap[commID].objects[0];
+        bool process(EventGenerator* gen, EventChannel*) {
+            m_info = static_cast<Server*> (gen);
 
-		DBGX("commID=%" PRIx64 "\n",commID);
+            PWR_Obj obj = m_info->m_commMap[commID].objects[0];
 
-		char name[100];
-		PWR_ObjGetName(obj,name,100);
-    	DBGX("obj='%s' attr=`%s`\n", name,
-                            PWR_AttrGetTypeString( attrName ) );
-		DBGX("period=%f count=%d\n", period, count );
-    	m_respEvent.id = id;
-		m_respEvent.data.resize( count );
-		m_respEvent.count = count;
-		PWR_StatusCreate(&m_status);
-    	m_req = PWR_ReqCreateCallback( m_info->m_ctx, m_status, 
-											(Callback)getSamplesFini, this );
-    	assert( m_req );
-			
-    	int ret = PWR_ObjAttrGetSamples_NB( obj, attrName,
-           		&m_respEvent.startTime, period, &m_respEvent.count, 
-				(void*) &m_respEvent.data[0], m_req );
+            DBGX("commID=%" PRIx64 "\n", commID);
 
-    	if ( ret != PWR_RET_SUCCESS ) {
-        	getSamplesFini( this );
-    	}
+            char name[100];
+            PWR_ObjGetName(obj, name, 100);
+            DBGX("obj='%s' attr=`%s`\n", name,
+                    PWR_AttrGetTypeString(attrName));
+            DBGX("period=%f count=%d\n", period, count);
+            m_respEvent.id = id;
+            m_respEvent.data.resize(count);
+            m_respEvent.count = count;
+            PWR_StatusCreate(&m_status);
+            m_req = PWR_ReqCreateCallback(m_info->m_ctx, m_status,
+                    (Callback) getSamplesFini, this);
+            assert(m_req);
 
-		return false;
-	}
+            int ret = PWR_ObjAttrGetSamples_NB(obj, attrName,
+                    &m_respEvent.startTime, period, &m_respEvent.count,
+                    (void*) &m_respEvent.data[0], m_req);
 
-    CommGetSamplesRespEvent   m_respEvent;
+            if (ret != PWR_RET_SUCCESS) {
+                getSamplesFini(this);
+            }
 
-	Server*			m_info;
-	PWR_Request	    m_req;
-	PWR_Status		m_status;
-};
+            return false;
+        }
 
-static void getSamplesFini( void* _data )
-{
-	SrvrCommGetSamplesReqEvent* data = (SrvrCommGetSamplesReqEvent*) _data; 
-    DBG4("PWR_Server","\n");
+        CommGetSamplesRespEvent m_respEvent;
 
-    PWR_Status status = data->m_status;
-    PWR_AttrAccessError error;
-    while ( PWR_RET_EMPTY != PWR_StatusPopError( status, &error ) ) {
+        Server* m_info;
+        PWR_Request m_req;
+        PWR_Status m_status;
+    };
 
-        data->m_respEvent.errValue.push_back( error.error ) ;
-        data->m_respEvent.errAttr.push_back( error.name ) ;
-        char name[100];
-        PWR_ObjGetName( error.obj, name, 100 );
-        data->m_respEvent.errObj.push_back( name );
+    static void getSamplesFini(void* _data) {
+        SrvrCommGetSamplesReqEvent* data = (SrvrCommGetSamplesReqEvent*) _data;
+        DBG4("PWR_Server", "\n");
+
+        PWR_Status status = data->m_status;
+        PWR_AttrAccessError error;
+        while (PWR_RET_EMPTY != PWR_StatusPopError(status, &error)) {
+
+            data->m_respEvent.errValue.push_back(error.error);
+            data->m_respEvent.errAttr.push_back(error.name);
+            char name[100];
+            PWR_ObjGetName(error.obj, name, 100);
+            data->m_respEvent.errObj.push_back(name);
+        }
+
+        PWR_StatusDestroy(data->m_status);
+
+        data->m_info->fini(data, &data->m_respEvent);
     }
-
-	PWR_StatusDestroy( data->m_status );
-
-	data->m_info->fini( data, &data->m_respEvent );
-}
 
 }
 

@@ -22,87 +22,88 @@
 
 namespace PWR_Router {
 
-	static inline void fpAdd( void* inout, void* in )
-	{
-		*(double*)inout += *(double*)in;
-	}
+    static inline void fpAdd(void* inout, void* in) {
+        *(double*) inout += *(double*) in;
+    }
 
-	class RtrCommRespEvent: public  CommRespEvent {
-		public:
-			RtrCommRespEvent( SerialBuf& buf ) : CommRespEvent( buf ){ }
+    class RtrCommRespEvent : public CommRespEvent {
+    public:
 
-			bool process( EventGenerator* _rtr, EventChannel* ) {
+        RtrCommRespEvent(SerialBuf& buf) : CommRespEvent(buf) {
+        }
 
-				DBGX("id=%p status=%"PRIi32" grpIndex=%" PRIu64 "\n",
-						(void*)id, status, grpIndex );
+        bool process(EventGenerator* _rtr, EventChannel*) {
 
-				CommReqInfo* info = (CommReqInfo*) id;
+            DBGX("id=%p status=%"PRIi32" grpIndex=%" PRIu64 "\n",
+                    (void*) id, status, grpIndex);
 
-				info->respQ[grpIndex].push_back( this );
+            CommReqInfo* info = (CommReqInfo*) id;
 
-				if ( info->respQ[grpIndex].size() == info->grpInfo[grpIndex] ) {
+            info->respQ[grpIndex].push_back(this);
 
-					CommRespEvent* resp = static_cast<CommRespEvent*>(info->resp);
-					if ( Get == info->ev->op ) {
-						DBGX("index %"PRIu64" is ready, num attrs %zu\n",
-								grpIndex, info->valueOp.size() );
-						resp->timeStamp[grpIndex].resize( info->valueOp.size() );
-						resp->value[grpIndex].resize( info->valueOp.size() );
+            if (info->respQ[grpIndex].size() == info->grpInfo[grpIndex]) {
 
-						for ( unsigned i = 0; i < info->valueOp.size(); i++ ) {
-							resp->value[grpIndex][i] = 0;
-						}
+                CommRespEvent* resp = static_cast<CommRespEvent*> (info->resp);
+                if (Get == info->ev->op) {
+                    DBGX("index %"PRIu64" is ready, num attrs %zu\n",
+                            grpIndex, info->valueOp.size());
+                    resp->timeStamp[grpIndex].resize(info->valueOp.size());
+                    resp->value[grpIndex].resize(info->valueOp.size());
 
-						for ( unsigned j = 0; j < info->respQ[grpIndex].size(); j++ ) {
-							for ( unsigned i = 0; i < info->valueOp.size(); i++ ) {
-								DBGX( "op=%d \n", info->valueOp[i] );
-								assert( FP_ADD == info->valueOp[i] );
+                    for (unsigned i = 0; i < info->valueOp.size(); i++) {
+                        resp->value[grpIndex][i] = 0;
+                    }
 
-								fpAdd( &resp->value[grpIndex][i],
-										&info->respQ[grpIndex][j]->value[0][i] );
+                    for (unsigned j = 0; j < info->respQ[grpIndex].size(); j++) {
+                        for (unsigned i = 0; i < info->valueOp.size(); i++) {
+                            DBGX("op=%d \n", info->valueOp[i]);
+                            assert(FP_ADD == info->valueOp[i]);
 
-								resp->timeStamp[grpIndex][i] =
-									info->respQ[grpIndex][j]->timeStamp[0][i];
-							}
-						}
-					}
-					for ( unsigned j = 0; j < info->respQ[grpIndex].size(); j++ ) {
-						resp->errValue.insert( resp->errValue.end(),
-								info->respQ[grpIndex][j]->errValue.begin(),
-								info->respQ[grpIndex][j]->errValue.end() );
-						resp->errAttr.insert( resp->errAttr.end(),
-								info->respQ[grpIndex][j]->errAttr.begin(),
-								info->respQ[grpIndex][j]->errAttr.end() );
-						resp->errObj.insert( resp->errObj.end(),
-								info->respQ[grpIndex][j]->errObj.begin(),
-								info->respQ[grpIndex][j]->errObj.end() );
+                            fpAdd(&resp->value[grpIndex][i],
+                                    &info->respQ[grpIndex][j]->value[0][i]);
 
-						if ( j < info->respQ[grpIndex].size() - 1 ) {
-							delete info->respQ[grpIndex][ j ];
-						}
-					}
-					// quiet valgrind
-					resp->grpIndex = 0;
-					resp->commID = 0;
+                            resp->timeStamp[grpIndex][i] =
+                                    info->respQ[grpIndex][j]->timeStamp[0][i];
+                        }
+                    }
+                }
+                for (unsigned j = 0; j < info->respQ[grpIndex].size(); j++) {
+                    resp->errValue.insert(resp->errValue.end(),
+                            info->respQ[grpIndex][j]->errValue.begin(),
+                            info->respQ[grpIndex][j]->errValue.end());
+                    resp->errAttr.insert(resp->errAttr.end(),
+                            info->respQ[grpIndex][j]->errAttr.begin(),
+                            info->respQ[grpIndex][j]->errAttr.end());
+                    resp->errObj.insert(resp->errObj.end(),
+                            info->respQ[grpIndex][j]->errObj.begin(),
+                            info->respQ[grpIndex][j]->errObj.end());
 
-					DBGX("pending %zu\n",info->pending);
-					--info->pending;
+                    if (j < info->respQ[grpIndex].size() - 1) {
+                        delete info->respQ[grpIndex][ j ];
+                    }
+                }
+                // quiet valgrind
+                resp->grpIndex = 0;
+                resp->commID = 0;
 
-					if ( 0 == info->pending ) {
-						DBGX("done send the response\n");
-						info->src->sendEvent( info->resp );
-						delete info->resp;
-						delete info->ev;
-						delete info;
-					}
+                DBGX("pending %zu\n", info->pending);
+                --info->pending;
 
-					return true;
+                if (0 == info->pending) {
+                    DBGX("done send the response\n");
+                    info->src->sendEvent(info->resp);
+                    delete info->resp;
+                    delete info->ev;
+                    delete info;
+                }
 
-				} else {
-					return false;
-				}
-			}
-	};
+                return true;
+
+            } else {
+                return false;
+            }
+        }
+    };
 
 }
 

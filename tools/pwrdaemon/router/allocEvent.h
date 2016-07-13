@@ -17,9 +17,9 @@
 
 namespace PWR_Router {
 
-	Event* allocClientEvent( unsigned int, SerialBuf& buf );
-	Event* allocServerEvent( unsigned int, SerialBuf& buf );
-	Event* allocRtrEvent( unsigned int, SerialBuf& buf );
+    Event* allocClientEvent(unsigned int, SerialBuf& buf);
+    Event* allocServerEvent(unsigned int, SerialBuf& buf);
+    Event* allocRtrEvent(unsigned int, SerialBuf& buf);
 
 }
 

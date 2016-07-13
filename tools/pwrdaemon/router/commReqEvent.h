@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _RTR_COMM_REQ_EVENT_H
 #define _RTR_COMM_REQ_EVENT_H
@@ -22,57 +22,59 @@
 
 namespace PWR_Router {
 
-class RtrCommReqEvent: public  CommReqEvent {
-  public:
-   	RtrCommReqEvent( SerialBuf& buf ) : CommReqEvent( buf ) {}  
+    class RtrCommReqEvent : public CommReqEvent {
+    public:
 
-	bool process(EventGenerator* _rtr, EventChannel* ec) {
-		Router& rtr = *static_cast<Router*>(_rtr);
-		Router::Client& client = *rtr.getClient( ec );
+        RtrCommReqEvent(SerialBuf& buf) : CommReqEvent(buf) {
+        }
 
-    	std::vector< std::vector< ObjID > >& commList = 
-				client.getCommList( commID );
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+            Router& rtr = *static_cast<Router*> (_rtr);
+            Router::Client& client = *rtr.getClient(ec);
 
-    	CommReqInfo* info = new CommReqInfo;
+            std::vector< std::vector< ObjID > >& commList =
+                    client.getCommList(commID);
 
-    	DBGX("commID=%"PRIx64" eventId=%"PRIx64" new eventId=%p\n", 
-													commID, id, info );
+            CommReqInfo* info = new CommReqInfo;
 
-    	info->src = ec;
-    	info->ev = this;
-		info->grpInfo.resize( commList.size() );
-		info->respQ.resize( commList.size() );
-		info->pending = commList.size();
-        info->resp = new CommRespEvent;
-        info->resp->id = id;
+            DBGX("commID=%"PRIx64" eventId=%"PRIx64" new eventId=%p\n",
+                    commID, id, info);
 
-    	id = (EventId) info;
+            info->src = ec;
+            info->ev = this;
+            info->grpInfo.resize(commList.size());
+            info->respQ.resize(commList.size());
+            info->pending = commList.size();
+            info->resp = new CommRespEvent;
+            info->resp->id = id;
 
-		if ( op == Get ) {
+            id = (EventId) info;
 
-			info->valueOp = valueOp;
+            if (op == Get) {
 
-			for ( size_t i = 0; i < valueOp.size(); i++ ) {
-				DBGX("valueOp=%d\n",valueOp[i]);	
-			}
+                info->valueOp = valueOp;
 
-        	static_cast<CommRespEvent*>(info->resp)->
-                            timeStamp.resize( commList.size() );
-        	static_cast<CommRespEvent*>(info->resp)->
-                            value.resize( commList.size() );
-   		}
+                for (size_t i = 0; i < valueOp.size(); i++) {
+                    DBGX("valueOp=%d\n", valueOp[i]);
+                }
 
-    	for ( unsigned int i=0; i <  commList.size(); i++ ) {
-			info->grpInfo[i] = commList[i].size();
+                static_cast<CommRespEvent*> (info->resp)->
+                        timeStamp.resize(commList.size());
+                static_cast<CommRespEvent*> (info->resp)->
+                        value.resize(commList.size());
+            }
 
-			grpIndex = i;
-    		for ( unsigned int j=0; j <  commList[i].size(); j++ ) {
-				rtr.sendEvent( commList[i][j], this );
-			}
-    	}
-		return false;
-	}
-};
+            for (unsigned int i = 0; i < commList.size(); i++) {
+                info->grpInfo[i] = commList[i].size();
+
+                grpIndex = i;
+                for (unsigned int j = 0; j < commList[i].size(); j++) {
+                    rtr.sendEvent(commList[i][j], this);
+                }
+            }
+            return false;
+        }
+    };
 
 }
 

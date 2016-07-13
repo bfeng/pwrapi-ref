@@ -14,34 +14,36 @@
 
 namespace PWR_Server {
 
-class SrvrRouterEvent: public RouterEvent {
-  public:
-   	SrvrRouterEvent( SerialBuf& buf ) : RouterEvent( buf ) {
-		DBGX("\n");
-	}  
-	~SrvrRouterEvent() {
-		DBGX("\n");
-	}  
+    class SrvrRouterEvent : public RouterEvent {
+    public:
 
-	bool process( EventGenerator* gen, EventChannel* ec ) {
+        SrvrRouterEvent(SerialBuf& buf) : RouterEvent(buf) {
+            DBGX("\n");
+        }
 
-        Server* info = static_cast<Server*>(gen);
+        ~SrvrRouterEvent() {
+            DBGX("\n");
+        }
 
-        DBGX("src=%" PRIx64 " dest=%" PRIx64 "\n",src,dest);
-        Event* ev = getPayload( allocReqEvent );
+        bool process(EventGenerator* gen, EventChannel* ec) {
 
-       	info->initFini( ev, this, ec );
+            Server* info = static_cast<Server*> (gen);
 
-        if ( ev->process( gen ) ) {
-            delete ev;
-			info->freeFini( ev );
-			return true;
-        } else {
-        	return false;
-		}
+            DBGX("src=%" PRIx64 " dest=%" PRIx64 "\n", src, dest);
+            Event* ev = getPayload(allocReqEvent);
 
-    }
-};
+            info->initFini(ev, this, ec);
+
+            if (ev->process(gen)) {
+                delete ev;
+                info->freeFini(ev);
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+    };
 
 };
 

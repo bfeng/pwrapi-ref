@@ -39,180 +39,189 @@ class Config;
 
 namespace PWR_Router {
 
+    struct Args {
 
-	struct Args {
-		Args( ) : rtrId(-1), coreArgs(NULL) { }
-		RouterID   	rtrId;
-		std::string routeTable;
-		std::string	serverPort;
-		std::string clientPort;
+        Args() : rtrId(-1), coreArgs(NULL) {
+        }
+        RouterID rtrId;
+        std::string routeTable;
+        std::string serverPort;
+        std::string clientPort;
 
-		RouterCoreArgs* coreArgs;
-	};
+        RouterCoreArgs* coreArgs;
+    };
 
-	class Router : public EventGenerator {
+    class Router : public EventGenerator {
+        typedef void (Router::*ChanFuncPtr)(EventChannel*);
 
-		typedef void (Router::*ChanFuncPtr)(EventChannel*);
+        class Chan : public ChanBase {
+        public:
 
-		class Chan : public ChanBase {
-			public:
-				Chan( Router* obj, ChanFuncPtr add, ChanFuncPtr del )  :
-					m_rtr(*obj), m_add( add ), m_del( del )
-			{}
+            Chan(Router* obj, ChanFuncPtr add, ChanFuncPtr del) :
+            m_rtr(*obj), m_add(add), m_del(del) {
+            }
 
-				void add( EventChannel* chan ) {
-					(m_rtr.*m_add)( chan );
-				}
-				void del( EventChannel* chan ) {
-					(m_rtr.*m_del)( chan );
-				}
-			private:
-				Router& 	m_rtr;
-				ChanFuncPtr m_add;
-				ChanFuncPtr m_del;
-		};
+            void add(EventChannel* chan) {
+                (m_rtr.*m_add)(chan);
+            }
 
-		public:
-		class Client {
-			public:
-				Client( Router& rtr );
-				~Client();
-				void addComm( CommID id, CommCreateEvent* ev );
-				std::vector< std::vector< ObjID > >& getCommList( CommID id );
+            void del(EventChannel* chan) {
+                (m_rtr.*m_del)(chan);
+            }
+        private:
+            Router& m_rtr;
+            ChanFuncPtr m_add;
+            ChanFuncPtr m_del;
+        };
 
-			private:
-				std::map<CommID,CommCreateEvent* > m_commMap;
-				Router& 	m_rtr;
-		};
+    public:
 
-		class Server {
-			public:
-				Server( Router& rtr ) :m_rtr(rtr) {
-					DBGX("\n");
-				}
-				~Server() {
-					m_rtr.delServer(m_name);
-				}
-				void initName( std::string name ) {
-					m_name = name;
-				}
-			private:
-				Router& 	m_rtr;
-				std::string 	m_name;
-		};
+        class Client {
+        public:
+            Client(Router& rtr);
+            ~Client();
+            void addComm(CommID id, CommCreateEvent* ev);
+            std::vector< std::vector< ObjID > >& getCommList(CommID id);
 
-		public:
+        private:
+            std::map<CommID, CommCreateEvent* > m_commMap;
+            Router& m_rtr;
+        };
 
-		Router( int, char* [] );
+        class Server {
+        public:
 
-		ServerID addServer( std::string name, EventChannel* ec ) {
-			AppID id = findRoute( name );
+            Server(Router& rtr) : m_rtr(rtr) {
+                DBGX("\n");
+            }
 
-			DBGX("rootObj=`%s` rtrId=%d serverId=%d\n",
-					name.c_str(), RTR_ID(id), SERVER_ID(id)  );
+            ~Server() {
+                m_rtr.delServer(m_name);
+            }
 
-			assert( (unsigned) -1 != id );
+            void initName(std::string name) {
+                m_name = name;
+            }
+        private:
+            Router& m_rtr;
+            std::string m_name;
+        };
 
-			m_localMap[ SERVER_ID(id) ] = ec;
-			m_serverMap[ ec ]->initName(name);
-			return SERVER_ID(id);
-		}
+    public:
 
-		void delServer( std::string name ) {
-			DBGX("%s\n",name.c_str());
-			//assert( m_localMap.find(name) != m_localMap.end() );
-			m_localMap.erase( 0 );
-		}
+        Router(int, char* []);
 
-		Client* getClient( EventChannel* ec ) {
-			assert ( m_clientMap.find(ec) != m_clientMap.end() );
-			return m_clientMap[ec];
-		}
+        ServerID addServer(std::string name, EventChannel* ec) {
+            AppID id = findRoute(name);
 
-		void sendEvent( AppID, Event* );
-		void sendEvent( ObjID, Event* );
+            DBGX("rootObj=`%s` rtrId=%d serverId=%d\n",
+                    name.c_str(), RTR_ID(id), SERVER_ID(id));
 
-		AppID findDestApp( ObjID );
-		int work();
+            assert((unsigned) - 1 != id);
 
-		Args m_args;
-		Chan m_client;
-		Chan m_server;
-		Chan m_router;
+            m_localMap[ SERVER_ID(id) ] = ec;
+            m_serverMap[ ec ]->initName(name);
+            return SERVER_ID(id);
+        }
 
-		ChannelSelect& chanSelect() { return *m_chanSelect; }
+        void delServer(std::string name) {
+            DBGX("%s\n", name.c_str());
+            //assert( m_localMap.find(name) != m_localMap.end() );
+            m_localMap.erase(0);
+        }
 
-		void doPending( ServerID );
+        Client* getClient(EventChannel* ec) {
+            assert(m_clientMap.find(ec) != m_clientMap.end());
+            return m_clientMap[ec];
+        }
 
-		private:
+        void sendEvent(AppID, Event*);
+        void sendEvent(ObjID, Event*);
 
-		EventChannel* findRtrChan( RouterID );
-		EventChannel* findServerChan( ServerID );
+        AppID findDestApp(ObjID);
+        int work();
 
-		AppID findRoute( ObjID id ) {
-			AppID retval = -1;
-			if ( m_routeTable.find(id) != m_routeTable.end() ) {
-				retval = m_routeTable[id];
-			}
-			DBGX("name=`%s` AppID=%"PRIx64"\n", id.c_str(), retval  )
-				return retval;
-		}
+        Args m_args;
+        Chan m_client;
+        Chan m_server;
+        Chan m_router;
 
-		void addClientChan( EventChannel* ec) {
-			DBGX("ec=%p\n",ec);
-			m_clientMap[ec] = new Client(*this);
-		}
+        ChannelSelect& chanSelect() {
+            return *m_chanSelect;
+        }
 
-		void delClientChan( EventChannel* ec ) {
-			DBGX("ec=%p\n",ec);
-			delete m_clientMap[ec];
-			m_clientMap.erase(ec);
-		}
+        void doPending(ServerID);
 
-		void addServerChan( EventChannel* ec) {
-			DBGX("ec=%p\n",ec);
-			m_serverMap[ec] = new Server(*this);
-		}
+    private:
 
-		void delServerChan( EventChannel* ec ) {
-			DBGX("ec=%p\n",ec);
-			delete m_serverMap[ec];
-			m_serverMap.erase(ec);
-		}
+        EventChannel* findRtrChan(RouterID);
+        EventChannel* findServerChan(ServerID);
 
-		void addRouterChan( EventChannel* ec) {
-			DBGX("\n");
-		}
-		void delRouterChan( EventChannel* ec) {
-			DBGX("\n");
-		}
+        AppID findRoute(ObjID id) {
+            AppID retval = -1;
+            if (m_routeTable.find(id) != m_routeTable.end()) {
+                retval = m_routeTable[id];
+            }
+            DBGX("name=`%s` AppID=%"PRIx64"\n", id.c_str(), retval)
+            return retval;
+        }
 
-		void initRouteTable( std::string file );
+        void addClientChan(EventChannel* ec) {
+            DBGX("ec=%p\n", ec);
+            m_clientMap[ec] = new Client(*this);
+        }
+
+        void delClientChan(EventChannel* ec) {
+            DBGX("ec=%p\n", ec);
+            delete m_clientMap[ec];
+            m_clientMap.erase(ec);
+        }
+
+        void addServerChan(EventChannel* ec) {
+            DBGX("ec=%p\n", ec);
+            m_serverMap[ec] = new Server(*this);
+        }
+
+        void delServerChan(EventChannel* ec) {
+            DBGX("ec=%p\n", ec);
+            delete m_serverMap[ec];
+            m_serverMap.erase(ec);
+        }
+
+        void addRouterChan(EventChannel* ec) {
+            DBGX("\n");
+        }
+
+        void delRouterChan(EventChannel* ec) {
+            DBGX("\n");
+        }
+
+        void initRouteTable(std::string file);
 
 
-		private:
-		ChannelSelect* 			             m_chanSelect;
+    private:
+        ChannelSelect* m_chanSelect;
 
-		std::map<EventChannel*,Server*>	             m_serverMap;
-		std::map<EventChannel*,Client*>	             m_clientMap;
+        std::map<EventChannel*, Server*> m_serverMap;
+        std::map<EventChannel*, Client*> m_clientMap;
 
-		std::map<ServerID,EventChannel*>             m_localMap;
-		RouterCore* 			             m_routerCore;
-		std::map< std::string, AppID >               m_routeTable;
-		std::map< AppID, std::deque< Event*> >       m_pendingEvents;
-	};
+        std::map<ServerID, EventChannel*> m_localMap;
+        RouterCore* m_routerCore;
+        std::map< std::string, AppID > m_routeTable;
+        std::map< AppID, std::deque< Event*> > m_pendingEvents;
+    };
 
-	struct CommReqInfo {
-		EventChannel*   				src;
-		CommEvent*      				ev;
-		std::vector<size_t>				grpInfo;
+    struct CommReqInfo {
+        EventChannel* src;
+        CommEvent* ev;
+        std::vector<size_t> grpInfo;
 
-		size_t						pending;
+        size_t pending;
 
-		std::vector<ValueOp>				valueOp;
-		std::vector< std::vector< CommRespEvent* > > 	respQ;
-		CommEvent* 					resp;
-	};
+        std::vector<ValueOp> valueOp;
+        std::vector< std::vector< CommRespEvent* > > respQ;
+        CommEvent* resp;
+    };
 
 }
 

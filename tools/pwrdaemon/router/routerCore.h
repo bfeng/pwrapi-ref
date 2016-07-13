@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _ROUTER_CORE_H
 #define _ROUTER_CORE_H
@@ -19,17 +19,19 @@ class ChannelSelect;
 
 namespace PWR_Router {
 
-typedef uint32_t RouterID;
+    typedef uint32_t RouterID;
 
-struct RouterCoreArgs {
-	virtual ~RouterCoreArgs() {}
-	std::string type;
-};
+    struct RouterCoreArgs {
 
-class RouterCore {
-  public:
-    virtual EventChannel* getChannel( RouterID ) = 0;
-};
+        virtual ~RouterCoreArgs() {
+        }
+        std::string type;
+    };
+
+    class RouterCore {
+    public:
+        virtual EventChannel* getChannel(RouterID) = 0;
+    };
 
 }
 

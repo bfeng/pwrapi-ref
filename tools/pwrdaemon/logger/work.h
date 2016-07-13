@@ -7,10 +7,10 @@
 
 namespace PWR_Logger {
 
-class Work {
-  public:
-    virtual int work( FILE* ) = 0;
-};
+    class Work {
+    public:
+        virtual int work(FILE*) = 0;
+    };
 
 }
 

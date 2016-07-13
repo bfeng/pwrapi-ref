@@ -17,12 +17,14 @@
 
 namespace PWR_Router {
 
-	class RtrCommCreateEvent: public  CommCreateEvent {
-		public:
-			RtrCommCreateEvent( SerialBuf& buf ) : CommCreateEvent( buf ) {}
+    class RtrCommCreateEvent : public CommCreateEvent {
+    public:
 
-			bool process( EventGenerator* _rtr, EventChannel* ec );
-	};
+        RtrCommCreateEvent(SerialBuf& buf) : CommCreateEvent(buf) {
+        }
+
+        bool process(EventGenerator* _rtr, EventChannel* ec);
+    };
 
 }
 

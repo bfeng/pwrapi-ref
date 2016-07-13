@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _RTR_RTR_ROUTER_EVENT_H
 #define _RTR_RTR_ROUTER_EVENT_H
@@ -19,18 +19,20 @@
 
 namespace PWR_Router {
 
-class RtrRouterEvent: public  RouterEvent {
-  public:
-    RtrRouterEvent( SerialBuf& buf ) : RouterEvent( buf ) {}
+    class RtrRouterEvent : public RouterEvent {
+    public:
 
-    bool process( EventGenerator* _rtr, EventChannel* ec ) {
-        Router& rtr = *static_cast<Router*>(_rtr);
-		DBGX("dest=%"PRIx64"\n",dest);
-		rtr.sendEvent( dest, this );
+        RtrRouterEvent(SerialBuf& buf) : RouterEvent(buf) {
+        }
 
-        return true;
-    }
-};
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+            Router& rtr = *static_cast<Router*> (_rtr);
+            DBGX("dest=%"PRIx64"\n", dest);
+            rtr.sendEvent(dest, this);
+
+            return true;
+        }
+    };
 
 }
 

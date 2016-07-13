@@ -12,27 +12,29 @@
 
 namespace PWR_Server {
 
-class SrvrCommDestroyEvent: public  CommDestroyEvent {
-  public:
-   	SrvrCommDestroyEvent( SerialBuf& buf ) : CommDestroyEvent( buf ) {
-		DBGX("\n");
-	}  
-	~SrvrCommDestroyEvent() {
-		DBGX("\n");
-	}
+    class SrvrCommDestroyEvent : public CommDestroyEvent {
+    public:
 
-	bool process( EventGenerator* gen, EventChannel* ) {
-		Server& info = *static_cast<Server*>(gen);
+        SrvrCommDestroyEvent(SerialBuf& buf) : CommDestroyEvent(buf) {
+            DBGX("\n");
+        }
 
-       	DBGX("commID=%"PRIx64"\n", commID);
+        ~SrvrCommDestroyEvent() {
+            DBGX("\n");
+        }
 
-		// We have a bunch of PWR_Obj hanging off of the comm.
-		// How/should we clean them up?	
-		info.m_commMap.erase(commID);
+        bool process(EventGenerator* gen, EventChannel*) {
+            Server& info = *static_cast<Server*> (gen);
 
-		return true;
-	}
-};
+            DBGX("commID=%"PRIx64"\n", commID);
+
+            // We have a bunch of PWR_Obj hanging off of the comm.
+            // How/should we clean them up?	
+            info.m_commMap.erase(commID);
+
+            return true;
+        }
+    };
 
 }
 

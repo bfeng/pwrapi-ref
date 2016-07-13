@@ -7,8 +7,8 @@
 
 namespace PWR_Server {
 
-Event* allocRtrEvent( unsigned int, SerialBuf& buf );
-Event* allocReqEvent( unsigned int, SerialBuf& buf );
+    Event* allocRtrEvent(unsigned int, SerialBuf& buf);
+    Event* allocReqEvent(unsigned int, SerialBuf& buf);
 
 }
 
