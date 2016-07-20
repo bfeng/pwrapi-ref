@@ -7,7 +7,7 @@
  * This file is part of the Power API Prototype software package. For license
  * information, see the LICENSE file in the top level directory of the
  * distribution.
-*/
+ */
 
 #ifndef _COMMUNICATOR_H
 #define _COMMUNICATOR_H
@@ -19,23 +19,29 @@ struct Event;
 
 namespace PowerAPI {
 
-class CommReq {
-  public:
-	  virtual ~CommReq() {} 
-	  virtual void process( Event* ) = 0;
-};
+    class CommReq {
+    public:
 
-class Communicator {
-  public:
-	Communicator() {}
-	virtual ~Communicator() {}
-	virtual void getValues(int, PWR_AttrName [], ValueOp [], CommReq* req ) = 0;
-	virtual void setValues( int, PWR_AttrName [], void* buf, CommReq* req ) = 0;
-	virtual void startLog( PWR_AttrName, CommReq* req ) = 0;
-	virtual void stopLog( PWR_AttrName, CommReq* req ) = 0;
-	virtual void getSamples( PWR_AttrName attr, PWR_Time start, double period, 
-				unsigned int count, CommReq* req ) = 0;
-};
+        virtual ~CommReq() {
+        }
+        virtual void process(Event*) = 0;
+    };
+
+    class Communicator {
+    public:
+
+        Communicator() {
+        }
+
+        virtual ~Communicator() {
+        }
+        virtual void getValues(int, PWR_AttrName [], ValueOp [], CommReq* req) = 0;
+        virtual void setValues(int, PWR_AttrName [], void* buf, CommReq* req) = 0;
+        virtual void startLog(PWR_AttrName, CommReq* req) = 0;
+        virtual void stopLog(PWR_AttrName, CommReq* req) = 0;
+        virtual void getSamples(PWR_AttrName attr, PWR_Time start, double period,
+                unsigned int count, CommReq* req) = 0;
+    };
 
 }
 

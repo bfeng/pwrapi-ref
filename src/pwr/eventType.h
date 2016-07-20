@@ -24,6 +24,7 @@
     NAME(CommGetSamplesResp) \
     NAME(ServerConnect) \
     NAME(Router2Router) \
+    NAME(RNETCommCreate) \
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,
