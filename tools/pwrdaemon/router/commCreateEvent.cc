@@ -45,3 +45,8 @@ bool RtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
 
     return false;
 }
+
+bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
+    DBGX("I'm going to forward all events to child routers.\n");
+    return false;
+}

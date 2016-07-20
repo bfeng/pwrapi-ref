@@ -26,6 +26,14 @@ namespace PWR_Router {
         bool process(EventGenerator* _rtr, EventChannel* ec);
     };
 
+    class RNETRtrCommCreateEvent : public RNETCommCreateEvent {
+    public:
+        RNETRtrCommCreateEvent(SerialBuf& buf) : RNETCommCreateEvent(buf) {
+            DBGX("\n");
+        }
+        
+        bool process(EventGenerator* _rtr, EventChannel* ec);
+    };
 }
 
 #endif
