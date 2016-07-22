@@ -38,6 +38,25 @@ class EventChannel;
 class Config;
 
 namespace PWR_Router {
+    class COMM {
+        public:
+            CommID ID;
+            std::string name;
+        private:
+            std::vector<CommID> members;
+    };
+    class CommunicatorStore {
+        public:
+            CommunicatorStore();
+            ~CommunicatorStore();
+            COMM newCOMM(std::string name);
+            void put(COMM);
+            bool has(COMM);
+            bool remove(COMM);
+        private:
+            std::vector<COMM> m_store;
+            CommID m_counter;
+    };
 
     struct Args {
 
@@ -47,6 +66,7 @@ namespace PWR_Router {
         std::string routeTable;
         std::string serverPort;
         std::string clientPort;
+        bool isLeaf;
 
         RouterCoreArgs* coreArgs;
     };
@@ -59,6 +79,10 @@ namespace PWR_Router {
 
             Chan(Router* obj, ChanFuncPtr add, ChanFuncPtr del) :
             m_rtr(*obj), m_add(add), m_del(del) {
+                if (NULL != getenv("POWERAPI_DEBUG")) {
+                    _DbgFlags = atoi(getenv("POWERAPI_DEBUG"));
+                }
+                DBGX("\n");
             }
 
             void add(EventChannel* chan) {
@@ -81,10 +105,12 @@ namespace PWR_Router {
             Client(Router& rtr);
             ~Client();
             void addComm(CommID id, CommCreateEvent* ev);
+            void addComm(CommID id, RNETCommCreateEvent* ev);
             std::vector< std::vector< ObjID > >& getCommList(CommID id);
 
         private:
             std::map<CommID, CommCreateEvent* > m_commMap;
+            std::map<CommID, RNETCommCreateEvent*> m_rnetCommMap;
             Router& m_rtr;
         };
 

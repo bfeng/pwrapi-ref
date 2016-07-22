@@ -15,6 +15,7 @@
 #include <debug.h> 
 #include "commCreateEvent.h" 
 #include "router.h"
+#include "rnetClient.h"
 
 using namespace PWR_Router;
 
@@ -47,6 +48,23 @@ bool RtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
 }
 
 bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
-    DBGX("I'm going to forward all events to child routers.\n");
+    Router& rtr = *static_cast<Router*> (_rtr);
+    Router::Client* client = rtr.getClient(ec);
+    DBGX("id=%"PRIx64"\n", commID);
+    client->addComm(commID, this);
+
+    // send to children
+    if (!rtr.m_args.isLeaf) {
+        DBGX("I'm not a leaf\n");
+        DBGX("I'm going to forward all events to child routers.\n");
+        RNET::POWERAPI::RNETClient new_client("bfeng-HP-Z240-Tower-Workstation", "25000");
+        Event* ev = new Event();
+        ev->type = RNETCommCreate;
+        new_client.sendEvent(ev);
+        delete ev;
+    } else {
+        DBGX("I'm a leaf\n");
+    }
+
     return false;
 }

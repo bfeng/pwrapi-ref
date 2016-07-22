@@ -34,6 +34,17 @@ namespace PWR_Router {
         }
     };
 
+    class RNETRtrRouterEvent : public RouterEvent {
+    public:
+
+        RNETRtrRouterEvent(SerialBuf& buf) : RouterEvent(buf) {
+        }
+
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+            DBGX("\n");
+            return true;
+        }
+    };
 }
 
 #endif

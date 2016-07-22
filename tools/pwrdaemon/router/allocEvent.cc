@@ -39,6 +39,8 @@ Event* PWR_Router::allocRtrEvent(unsigned int type, SerialBuf& buf) {
             assert(0);
         case Router2Router:
             return new RtrRouterEvent(buf);
+        case RNETRouter2Router:
+            return new RNETRtrRouterEvent(buf);
     }
     return NULL;
 }
@@ -57,6 +59,8 @@ Event* PWR_Router::allocClientEvent(unsigned int type, SerialBuf& buf) {
             return new RtrCommLogReqEvent(buf);
         case CommGetSamplesReq:
             return new RtrCommGetSamplesReqEvent(buf);
+        case RNETCommCreate:
+            return new RNETRtrCommCreateEvent(buf);
     }
     return NULL;
 }

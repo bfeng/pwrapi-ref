@@ -21,6 +21,8 @@ TreeCore::TreeCore(RouterCoreArgs* _args, Router* router) {
     TreeArgs& args = *static_cast<TreeArgs*> (_args);
 
     int nLinks = args.links.size();
+    
+    DBGX("links=%d\n", nLinks);
 
     m_rtrLinks.resize(nLinks);
     for (int i = 0; i < nLinks; i++) {

@@ -27,6 +27,46 @@
 
 using namespace PWR_Router;
 
+CommunicatorStore::CommunicatorStore() {
+    m_counter = 0;
+}
+
+CommunicatorStore::~CommunicatorStore() {
+    m_store.clear();
+}
+
+COMM CommunicatorStore::newCOMM(std::string name) {
+    COMM c;
+    c.ID = m_counter++;
+    c.name = name;
+    return c;
+}
+
+void CommunicatorStore::put(COMM c) {
+    m_store.push_back(c);
+}
+
+bool CommunicatorStore::has(COMM c) {
+    std::vector<COMM>::iterator it;
+    for(it = m_store.begin(); it != m_store.end(); it++) {
+        if((*it).ID == c.ID && (*it).name == c.name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CommunicatorStore::remove(COMM c) {
+    std::vector<COMM>::iterator it;
+    for(it = m_store.begin(); it != m_store.end(); it++) {
+        if((*it).ID == c.ID && (*it).name == c.name) {
+            m_store.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
 static void initArgs(int argc, char* argv[], Args*);
 
 Router::Router(int argc, char* argv[]) :
@@ -104,6 +144,7 @@ void Router::initRouteTable(std::string file) {
 int Router::work() {
     SelectData* data;
 
+    DBGX("\n");
     while ((data = static_cast<SelectData*> (m_chanSelect->wait()))) {
         if (data->process(m_chanSelect, this)) {
             delete data;
@@ -221,7 +262,7 @@ static void initArgs(int argc, char* argv[], Args* args) {
     int long_index = 0;
 
     enum {
-        CLNT_PORT, SRVR_PORT, RTR_TYPE, RTR_INFO, RTR_ID, PWRAPI_CONFIG, RTR_TABLE
+        CLNT_PORT, SRVR_PORT, RTR_TYPE, RTR_INFO, RTR_ID, PWRAPI_CONFIG, RTR_TABLE, RTR_LEAF
     };
     static struct option long_options[] = {
         {"clientPort", required_argument, NULL, CLNT_PORT},
@@ -230,6 +271,7 @@ static void initArgs(int argc, char* argv[], Args* args) {
         {"routerInfo", required_argument, NULL, RTR_INFO},
         {"routerId", required_argument, NULL, RTR_ID},
         {"routeTable", required_argument, NULL, RTR_TABLE},
+        {"isLeaf", required_argument, NULL, RTR_LEAF},
         {0, 0, 0, 0}
     };
 
@@ -248,6 +290,9 @@ static void initArgs(int argc, char* argv[], Args* args) {
                 break;
             case RTR_TABLE:
                 args->routeTable = optarg;
+                break;
+            case RTR_LEAF:
+                args->isLeaf = strcmp(optarg, "0");
                 break;
             case RTR_TYPE:
                 assert(!args->coreArgs);
@@ -284,6 +329,7 @@ static void initArgs(int argc, char* argv[], Args* args) {
 }
 
 void initTreeInfo(TreeArgs* args, std::string info) {
+    DBG4("PWR_Router", "\n");
     size_t pos = info.find_first_of(':');
     unsigned int link = atoi(info.substr(0, pos).c_str());
     args->links.resize(link + 1);

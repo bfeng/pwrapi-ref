@@ -110,19 +110,19 @@ struct RNETCommCreateEvent : public CommEvent {
         serialize_in(buf);
     }
 
-    RNETCommCreateEvent(const RNETCommCreateEvent& x) : members(x.members) {
+    RNETCommCreateEvent(const RNETCommCreateEvent& x) : children(x.children) {
     }
 
-    std::vector< std::vector<ObjID > > members;
+    std::vector< std::vector<ObjID > > children;
 
     virtual void serialize_in(SerialBuf& buf) {
-        buf >> members;
+        buf >> children;
         CommEvent::serialize_in(buf);
     }
 
     virtual void serialize_out(SerialBuf& buf) {
         CommEvent::serialize_out(buf);
-        buf << members;
+        buf << children;
     }
 };
 
