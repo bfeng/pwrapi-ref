@@ -27,44 +27,49 @@
 
 using namespace PWR_Router;
 
-CommunicatorStore::CommunicatorStore() {
-    m_counter = 0;
-}
+namespace RNET {
+    namespace POWERAPI {
 
-CommunicatorStore::~CommunicatorStore() {
-    m_store.clear();
-}
+        CommunicatorStore::CommunicatorStore() {
+            m_counter = 0;
+        }
 
-COMM CommunicatorStore::newCOMM(std::string name) {
-    COMM c;
-    c.ID = m_counter++;
-    c.name = name;
-    return c;
-}
+        CommunicatorStore::~CommunicatorStore() {
+            m_store.clear();
+        }
 
-void CommunicatorStore::put(COMM c) {
-    m_store.push_back(c);
-}
+        COMM CommunicatorStore::newCOMM(std::string name) {
+            COMM c;
+            c.ID = m_counter++;
+            c.name = name;
+            return c;
+        }
 
-bool CommunicatorStore::has(COMM c) {
-    std::vector<COMM>::iterator it;
-    for(it = m_store.begin(); it != m_store.end(); it++) {
-        if((*it).ID == c.ID && (*it).name == c.name) {
-            return true;
+        void CommunicatorStore::put(COMM c) {
+            m_store.push_back(c);
+        }
+
+        bool CommunicatorStore::has(COMM c) {
+            std::vector<COMM>::iterator it;
+            for (it = m_store.begin(); it != m_store.end(); it++) {
+                if ((*it).ID == c.ID && (*it).name == c.name) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool CommunicatorStore::remove(COMM c) {
+            std::vector<COMM>::iterator it;
+            for (it = m_store.begin(); it != m_store.end(); it++) {
+                if ((*it).ID == c.ID && (*it).name == c.name) {
+                    m_store.erase(it);
+                    return true;
+                }
+            }
+            return false;
         }
     }
-    return false;
-}
-
-bool CommunicatorStore::remove(COMM c) {
-    std::vector<COMM>::iterator it;
-    for(it = m_store.begin(); it != m_store.end(); it++) {
-        if((*it).ID == c.ID && (*it).name == c.name) {
-            m_store.erase(it);
-            return true;
-        }
-    }
-    return false;
 }
 
 static void initArgs(int argc, char* argv[], Args*);

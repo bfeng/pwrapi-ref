@@ -45,7 +45,7 @@ namespace RNET {
             std::string config = "server=" + m_args.routerHost + " serverPort=" + m_args.routerPort;
             DBGX("config:%s\n", config.c_str());
             this->m_routerChannel = getEventChannel("TCP", NULL, config, "router");
-            m_commStore = new PWR_Router::CommunicatorStore();
+            m_commStore = new CommunicatorStore();
         }
         
         RNETClient::RNETClient(std::string host, std::string port) : m_chanSelect(NULL) {
@@ -57,7 +57,7 @@ namespace RNET {
             std::string config = "server=" + m_args.routerHost + " serverPort=" + m_args.routerPort;
             DBGX("config:%s\n", config.c_str());
             this->m_routerChannel = getEventChannel("TCP", NULL, config, "router");
-            m_commStore = new PWR_Router::CommunicatorStore();
+            m_commStore = new CommunicatorStore();
         }
 
         RNETClient::~RNETClient() {
@@ -72,7 +72,7 @@ namespace RNET {
                 {
                     //CommCreateEvent *ev = static_cast<CommCreateEvent*>(ev);
                     RNETCommCreateEvent *evt = new RNETCommCreateEvent();
-                    PWR_Router::COMM c = this->m_commStore->newCOMM("WORLD");
+                    COMM c = this->m_commStore->newCOMM("WORLD");
                     evt->type = RNETCommCreate;
                     evt->commID = c.ID;
                     DBGX("\n");

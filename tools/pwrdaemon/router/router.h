@@ -37,15 +37,18 @@ typedef uint32_t ServerID;
 class EventChannel;
 class Config;
 
-namespace PWR_Router {
-    class COMM {
+namespace RNET {
+    namespace POWERAPI {
+
+        class COMM {
         public:
             CommID ID;
             std::string name;
         private:
             std::vector<CommID> members;
-    };
-    class CommunicatorStore {
+        };
+
+        class CommunicatorStore {
         public:
             CommunicatorStore();
             ~CommunicatorStore();
@@ -56,7 +59,11 @@ namespace PWR_Router {
         private:
             std::vector<COMM> m_store;
             CommID m_counter;
-    };
+        };
+    }
+}
+
+namespace PWR_Router {
 
     struct Args {
 

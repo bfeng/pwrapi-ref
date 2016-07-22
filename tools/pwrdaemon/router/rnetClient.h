@@ -32,7 +32,7 @@ namespace RNET {
                 ~RNETClient();
                 void sendEvent(Event *ev);
             private:
-                PWR_Router::CommunicatorStore * m_commStore;
+                CommunicatorStore * m_commStore;
                 Args m_args;
                 ChannelSelect * m_chanSelect;
                 EventChannel * m_routerChannel;
