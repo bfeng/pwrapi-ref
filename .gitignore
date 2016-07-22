@@ -2,6 +2,11 @@
 *config.h*
 *.Plo
 *.Po
+*.pyc
+*.la
+*.lo
+*.o
+*.class
 libtool
 aclocal.m4
 Makefile
@@ -23,3 +28,5 @@ config/lt~obsolete.m4
 config/missing
 config/py-compile
 src/stamp-h1
+**/.libs/
+**/.deps/
