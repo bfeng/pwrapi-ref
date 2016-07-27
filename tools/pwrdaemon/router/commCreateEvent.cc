@@ -16,6 +16,7 @@
 #include "commCreateEvent.h" 
 #include "router.h"
 #include "rnetClient.h"
+#include "treeCore.h"
 
 using namespace PWR_Router;
 
@@ -47,24 +48,52 @@ bool RtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
     return false;
 }
 
+bool RNETRtrCommCreateEvent::processImpl1(Router rtr) {
+    DBGX("\n");
+    if (!rtr.m_args.isLeaf) {
+        DBGX("I'm not a leaf\n");
+        DBGX("I'm going to forward all events to child routers.\n");
+        Event* ev = new Event();
+        ev->type = RNETRouter2Router;
+        rtr.sendEvent("node1", ev);
+    } else {
+        DBGX("I'm a leaf\n");
+    }
+    return false;
+}
+
+bool RNETRtrCommCreateEvent::processImpl2(Router rtr) {
+    // send to children
+    if (!rtr.m_args.isLeaf) {
+        DBGX("I'm not a leaf\n");
+        DBGX("I'm going to forward all events to child routers.\n");
+
+        if (0 == rtr.m_args.coreArgs->type.compare("tree")) {
+            TreeArgs* args = static_cast<TreeArgs*> (rtr.m_args.coreArgs);
+            std::vector<Link>::iterator iter;
+            for (iter = args->links.begin(); iter != args->links.end(); ++iter) {
+                DBGX("Link=%s:%s\n", (*iter).otherHost.c_str(), (*iter).otherHostListenPort.c_str());
+                RNET::POWERAPI::RNETClient new_client1((*iter).otherHost, (*iter).otherHostListenPort);
+                Event* ev = new Event();
+                ev->type = RNETCommCreate;
+                new_client1.sendEvent(ev);
+                delete ev;
+            }
+        }
+    } else {
+        DBGX("I'm a leaf\n");
+    }
+    return false;
+}
+
 bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
     Router& rtr = *static_cast<Router*> (_rtr);
     Router::Client* client = rtr.getClient(ec);
     DBGX("id=%"PRIx64"\n", commID);
     client->addComm(commID, this);
 
-    // send to children
-    if (!rtr.m_args.isLeaf) {
-        DBGX("I'm not a leaf\n");
-        DBGX("I'm going to forward all events to child routers.\n");
-        RNET::POWERAPI::RNETClient new_client("bfeng-HP-Z240-Tower-Workstation", "25000");
-        Event* ev = new Event();
-        ev->type = RNETCommCreate;
-        new_client.sendEvent(ev);
-        delete ev;
-    } else {
-        DBGX("I'm a leaf\n");
-    }
-
-    return false;
+    RNET::POWERAPI::COMM c = rtr.m_commStore->newCOMM(commID);
+    rtr.m_commStore->put(c);
+    
+    return processImpl2(rtr);
 }

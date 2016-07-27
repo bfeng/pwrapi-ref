@@ -38,6 +38,16 @@ namespace RNET {
             m_store.clear();
         }
 
+        COMM CommunicatorStore::newCOMM(CommID commID) {
+            COMM c;
+            m_counter = commID;
+            c.ID = m_counter++;
+            if (c.ID == 0) {
+                c.name = "WORLD";
+            }
+            return c;
+        }
+
         COMM CommunicatorStore::newCOMM(std::string name) {
             COMM c;
             c.ID = m_counter++;
@@ -68,6 +78,13 @@ namespace RNET {
                 }
             }
             return false;
+        }
+
+        void CommunicatorStore::dump() {
+            std::vector<COMM>::iterator it;
+            for (it = m_store.begin(); it != m_store.end(); ++it) {
+                DBGX("ID=%lu:Name=%s:Group=%u\n", (*it).ID, (*it).name.c_str(), (*it).getGroup());
+            }
         }
     }
 }
@@ -121,6 +138,7 @@ m_chanSelect(NULL) {
     }
 
     initRouteTable(m_args.routeTable);
+    this->m_commStore = new RNET::POWERAPI::CommunicatorStore();
 }
 
 void Router::initRouteTable(std::string file) {

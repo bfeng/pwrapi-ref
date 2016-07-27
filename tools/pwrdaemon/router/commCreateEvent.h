@@ -14,6 +14,7 @@
 
 #include <events.h>
 #include <eventChannel.h>
+#include "router.h"
 
 namespace PWR_Router {
 
@@ -33,6 +34,9 @@ namespace PWR_Router {
         }
         
         bool process(EventGenerator* _rtr, EventChannel* ec);
+    private:
+        bool processImpl1(Router rtr);
+        bool processImpl2(Router rtr);
     };
 }
 

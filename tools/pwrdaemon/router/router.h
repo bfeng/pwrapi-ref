@@ -44,18 +44,23 @@ namespace RNET {
         public:
             CommID ID;
             std::string name;
+            unsigned int getGroup() {
+                return this->groupID;
+            }
         private:
-            std::vector<CommID> members;
+            unsigned int groupID;
         };
 
         class CommunicatorStore {
         public:
             CommunicatorStore();
             ~CommunicatorStore();
+            COMM newCOMM(CommID commID);
             COMM newCOMM(std::string name);
             void put(COMM);
             bool has(COMM);
             bool remove(COMM);
+            void dump();
         private:
             std::vector<COMM> m_store;
             CommID m_counter;
@@ -178,6 +183,7 @@ namespace PWR_Router {
         Chan m_client;
         Chan m_server;
         Chan m_router;
+        RNET::POWERAPI::CommunicatorStore * m_commStore;
 
         ChannelSelect& chanSelect() {
             return *m_chanSelect;
@@ -230,8 +236,8 @@ namespace PWR_Router {
         }
 
         void initRouteTable(std::string file);
-
-
+        
+        
     private:
         ChannelSelect* m_chanSelect;
 

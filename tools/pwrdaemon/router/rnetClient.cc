@@ -72,7 +72,8 @@ namespace RNET {
                 {
                     //CommCreateEvent *ev = static_cast<CommCreateEvent*>(ev);
                     RNETCommCreateEvent *evt = new RNETCommCreateEvent();
-                    COMM c = this->m_commStore->newCOMM("WORLD");
+                    COMM c = this->m_commStore->newCOMM(0);
+                    this->m_commStore->put(c);
                     evt->type = RNETCommCreate;
                     evt->commID = c.ID;
                     DBGX("\n");

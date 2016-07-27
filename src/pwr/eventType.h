@@ -25,6 +25,7 @@
     NAME(ServerConnect) \
     NAME(Router2Router) \
     NAME(RNETCommCreate) \
+    NAME(RNETRouter2Router) \
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,
