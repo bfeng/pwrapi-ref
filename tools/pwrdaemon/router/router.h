@@ -44,6 +44,10 @@ namespace RNET {
         public:
             CommID ID;
             std::string name;
+            
+            COMM() {
+                this->groupID = 0;
+            }
 
             unsigned int getGroup() {
                 return this->groupID;

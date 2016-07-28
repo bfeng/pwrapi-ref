@@ -16,6 +16,7 @@
 #include "eventChannel.h"
 #include "events.h"
 #include "router.h"
+#include "routerCore.h"
 
 namespace RNET {
     namespace POWERAPI {
@@ -30,6 +31,8 @@ namespace RNET {
                 RNETClient(int, char* []);
                 RNETClient(std::string, std::string);
                 ~RNETClient();
+                void initWORLD();
+                void initCommunicator(std::string key, PWR_Router::RouterID rtrs[], unsigned int n);
                 void sendEvent(Event *ev);
             private:
                 CommunicatorStore * m_commStore;

@@ -48,25 +48,16 @@ bool RtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
     return false;
 }
 
-bool RNETRtrCommCreateEvent::processImpl1(Router rtr) {
-    DBGX("\n");
-    if (0 == rtr.m_args.coreArgs->type.compare("tree")) {
-        TreeArgs* args = static_cast<TreeArgs*> (rtr.m_args.coreArgs);
-        // send to children
-        if (!args->isLeaf) {
-            DBGX("I'm not a leaf\n");
-            DBGX("I'm going to forward all events to child routers.\n");
-            Event* ev = new Event();
-            ev->type = RNETRouter2Router;
-            rtr.sendEvent("node1", ev);
-        } else {
-            DBGX("I'm a leaf\n");
-        }
+void RNETRtrCommCreateEvent::copyTo(RNETCommCreateEvent* ev) {
+    ev->commID = commID;
+    ev->commName = commName;
+    for (unsigned int i = 0; i < children.size(); ++i) {
+        DBGX("RouterID=%d\n", children[i]);
+        ev->children.push_back(children[i]);
     }
-    return false;
 }
 
-bool RNETRtrCommCreateEvent::processImpl2(Router rtr) {
+bool RNETRtrCommCreateEvent::processImpl(Router rtr) {
     if (0 == rtr.m_args.coreArgs->type.compare("tree")) {
         TreeArgs* args = static_cast<TreeArgs*> (rtr.m_args.coreArgs);
         // send to children
@@ -78,7 +69,7 @@ bool RNETRtrCommCreateEvent::processImpl2(Router rtr) {
                 DBGX("Link=%s:%s\n", (*iter).otherHost.c_str(), (*iter).otherHostListenPort.c_str());
                 RNET::POWERAPI::RNETClient new_client((*iter).otherHost, (*iter).otherHostListenPort);
                 RNETCommCreateEvent* ev = new RNETCommCreateEvent();
-                ev->type = RNETCommCreate;
+                copyTo(ev);
                 new_client.sendEvent(ev);
                 delete ev;
             }
@@ -94,7 +85,9 @@ bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
     DBGX("id=%"PRIx64"\n", commID);
 
     RNET::POWERAPI::COMM c = rtr.m_commStore->newCOMM(commID);
+    c.name = commName;
     rtr.m_commStore->put(c);
+    rtr.m_commStore->dump();
 
-    return processImpl2(rtr);
+    return processImpl(rtr);
 }

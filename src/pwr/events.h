@@ -20,6 +20,7 @@
 
 typedef std::string ObjID;
 typedef uint64_t CommID;
+typedef uint32_t RouterID;
 
 struct ServerConnectEvent : public Event {
 
@@ -104,6 +105,7 @@ struct CommCreateEvent : public CommEvent {
 struct RNETCommCreateEvent : public CommEvent {
 
     RNETCommCreateEvent() : CommEvent(RNETCommCreate) {
+        this->type = RNETCommCreate;
     }
 
     RNETCommCreateEvent(SerialBuf& buf) {
@@ -113,9 +115,11 @@ struct RNETCommCreateEvent : public CommEvent {
     RNETCommCreateEvent(const RNETCommCreateEvent& x) : children(x.children) {
     }
 
-    std::vector< std::vector<ObjID > > children;
+    std::string commName;
+    std::vector<RouterID> children;
 
     virtual void serialize_in(SerialBuf& buf) {
+        buf >> commName;
         buf >> children;
         CommEvent::serialize_in(buf);
     }
@@ -123,6 +127,7 @@ struct RNETCommCreateEvent : public CommEvent {
     virtual void serialize_out(SerialBuf& buf) {
         CommEvent::serialize_out(buf);
         buf << children;
+        buf << commName;
     }
 };
 

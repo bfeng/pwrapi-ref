@@ -47,7 +47,7 @@ namespace RNET {
             this->m_routerChannel = getEventChannel("TCP", NULL, config, "router");
             m_commStore = new CommunicatorStore();
         }
-        
+
         RNETClient::RNETClient(std::string host, std::string port) : m_chanSelect(NULL) {
             DBGX("\n");
             m_args.routerHost = host;
@@ -67,21 +67,37 @@ namespace RNET {
 
         void RNETClient::sendEvent(Event* ev) {
             DBGX("\n");
-            switch (ev->type) {
-                case RNETCommCreate:
-                {
-                    //CommCreateEvent *ev = static_cast<CommCreateEvent*>(ev);
-                    RNETCommCreateEvent *evt = new RNETCommCreateEvent();
-                    COMM c = this->m_commStore->newCOMM(0);
-                    this->m_commStore->put(c);
-                    evt->type = RNETCommCreate;
-                    evt->commID = c.ID;
-                    DBGX("\n");
-                    this->m_routerChannel->sendEvent(evt);
-                    delete evt;
-                    break;
+            this->m_routerChannel->sendEvent(ev);
+        }
+
+        void RNETClient::initCommunicator(std::string key, PWR_Router::RouterID rtrs[], unsigned int n) {
+            if (rtrs == NULL || n == 0) {
+                DBGX("\n");
+                RNETCommCreateEvent *evt = new RNETCommCreateEvent();
+                COMM c = this->m_commStore->newCOMM(0);
+                this->m_commStore->put(c);
+                evt->commID = c.ID;
+                evt->commName = c.name;
+                this->sendEvent(evt);
+                delete evt;
+            } else {
+                DBGX("\n");
+                RNETCommCreateEvent *evt = new RNETCommCreateEvent();
+                COMM c = this->m_commStore->newCOMM(key);
+                this->m_commStore->put(c);
+                evt->commID = c.ID;
+                evt->commName = c.name;
+                for (unsigned int i = 0; i < n; ++i) {
+                    evt->children.push_back(rtrs[i]);
                 }
+                this->sendEvent(evt);
+                delete evt;
             }
+            this->m_commStore->dump();
+        }
+
+        void RNETClient::initWORLD() {
+            this->initCommunicator("", NULL, 0);
         }
     }
 }

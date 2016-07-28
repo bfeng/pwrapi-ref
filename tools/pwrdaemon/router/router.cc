@@ -56,6 +56,13 @@ namespace RNET {
         }
 
         void CommunicatorStore::put(COMM c) {
+            std::vector<COMM>::iterator it;
+            for (it = m_store.begin(); it != m_store.end(); it++) {
+                if ((*it).ID == c.ID) {
+                    (*it).name = c.name;
+                    return;
+                }
+            }
             m_store.push_back(c);
         }
 

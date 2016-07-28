@@ -34,10 +34,10 @@ namespace PWR_Router {
             DBGX("\n");
         }
 
+        void copyTo(RNETCommCreateEvent *ev);
         bool process(EventGenerator* _rtr, EventChannel* ec);
     private:
-        bool processImpl1(Router rtr);
-        bool processImpl2(Router rtr);
+        bool processImpl(Router rtr);
     };
 }
 
