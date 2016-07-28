@@ -30,3 +30,13 @@ config/py-compile
 src/stamp-h1
 **/.libs/
 **/.deps/
+**/.dirstamp
+nbproject/
+/tools/pwrgen
+/tools/pwrdmp
+/tools/pwrdaemon/pwrdaemon
+/examples/dummyTest
+/examples/simpleTest
+/examples/snippet
+/test/compliance
+/tools/pwrapi
