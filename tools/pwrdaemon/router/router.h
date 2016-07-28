@@ -44,6 +44,7 @@ namespace RNET {
         public:
             CommID ID;
             std::string name;
+
             unsigned int getGroup() {
                 return this->groupID;
             }
@@ -78,7 +79,6 @@ namespace PWR_Router {
         std::string routeTable;
         std::string serverPort;
         std::string clientPort;
-        bool isLeaf;
 
         RouterCoreArgs* coreArgs;
     };
@@ -117,12 +117,12 @@ namespace PWR_Router {
             Client(Router& rtr);
             ~Client();
             void addComm(CommID id, CommCreateEvent* ev);
-            void addComm(CommID id, RNETCommCreateEvent* ev);
+            //            void addComm(CommID id, RNETCommCreateEvent* ev);
             std::vector< std::vector< ObjID > >& getCommList(CommID id);
 
         private:
             std::map<CommID, CommCreateEvent* > m_commMap;
-            std::map<CommID, RNETCommCreateEvent*> m_rnetCommMap;
+            //            std::map<CommID, RNETCommCreateEvent*> m_rnetCommMap;
             Router& m_rtr;
         };
 
@@ -236,8 +236,8 @@ namespace PWR_Router {
         }
 
         void initRouteTable(std::string file);
-        
-        
+
+
     private:
         ChannelSelect* m_chanSelect;
 

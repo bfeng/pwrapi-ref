@@ -29,10 +29,11 @@ namespace PWR_Router {
 
     class RNETRtrCommCreateEvent : public RNETCommCreateEvent {
     public:
+
         RNETRtrCommCreateEvent(SerialBuf& buf) : RNETCommCreateEvent(buf) {
             DBGX("\n");
         }
-        
+
         bool process(EventGenerator* _rtr, EventChannel* ec);
     private:
         bool processImpl1(Router rtr);

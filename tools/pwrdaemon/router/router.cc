@@ -294,7 +294,6 @@ static void initArgs(int argc, char* argv[], Args* args) {
         {"routerInfo", required_argument, NULL, RTR_INFO},
         {"routerId", required_argument, NULL, RTR_ID},
         {"routeTable", required_argument, NULL, RTR_TABLE},
-        {"isLeaf", required_argument, NULL, RTR_LEAF},
         {0, 0, 0, 0}
     };
 
@@ -313,9 +312,6 @@ static void initArgs(int argc, char* argv[], Args* args) {
                 break;
             case RTR_TABLE:
                 args->routeTable = optarg;
-                break;
-            case RTR_LEAF:
-                args->isLeaf = strcmp(optarg, "0");
                 break;
             case RTR_TYPE:
                 assert(!args->coreArgs);

@@ -32,6 +32,7 @@ namespace PWR_Router {
 
     struct TreeArgs : public RouterCoreArgs {
         std::vector<Link> links;
+        bool isLeaf;
     };
 
     class TreeCore : public RouterCore {

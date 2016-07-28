@@ -33,35 +33,11 @@ Router::Client::~Client() {
 
         delete ev;
     }
-
-    std::map<CommID, RNETCommCreateEvent* >::iterator rnet_iter;
-    for (rnet_iter = m_rnetCommMap.begin(); rnet_iter != m_rnetCommMap.end(); ++rnet_iter) {
-
-        RNETCommCreateEvent* ev = rnet_iter->second;
-        DBGX("CommID: %lu\n", ev->commID);
-        /*
-        for (unsigned int i = 0; i < ev->members[0].size(); i++) {
-            DBGX("%s\n", ev->members[0][i].c_str());
-            CommDestroyEvent* d_ev = new CommDestroyEvent;
-            d_ev->commID = ev->commID;
-            m_rtr.sendEvent(ev->members[0][i].c_str(), d_ev);
-            delete d_ev;
-        }
-
-        delete ev;
-        */
-    }
-
 }
 
 void Router::Client::addComm(CommID id, CommCreateEvent* ev) {
     assert(m_commMap.find(id) == m_commMap.end());
     m_commMap[id] = ev;
-}
-
-void Router::Client::addComm(CommID id, RNETCommCreateEvent* ev) {
-    assert(m_rnetCommMap.find(id) == m_rnetCommMap.end());
-    m_rnetCommMap[id] = ev;
 }
 
 std::vector< std::vector< ObjID > >& Router::Client::getCommList(CommID id) {
