@@ -17,6 +17,7 @@
 #include "events.h"
 #include "router.h"
 #include "routerCore.h"
+#include "rnetCommunicator.h"
 
 namespace RNET {
     namespace POWERAPI {
