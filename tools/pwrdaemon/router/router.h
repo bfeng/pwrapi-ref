@@ -27,6 +27,7 @@
 #include "commCreateEvent.h"
 #include "routerCore.h"
 #include "impTypes.h"
+#include "rnetCommunicator.h"
 
 typedef uint32_t ServerID;
 
@@ -36,42 +37,6 @@ typedef uint32_t ServerID;
 
 class EventChannel;
 class Config;
-
-namespace RNET {
-    namespace POWERAPI {
-
-        class COMM {
-        public:
-            CommID ID;
-            std::string name;
-            
-            COMM() {
-                this->groupID = 0;
-            }
-
-            unsigned int getGroup() {
-                return this->groupID;
-            }
-        private:
-            unsigned int groupID;
-        };
-
-        class CommunicatorStore {
-        public:
-            CommunicatorStore();
-            ~CommunicatorStore();
-            COMM newCOMM(CommID commID);
-            COMM newCOMM(std::string name);
-            void put(COMM);
-            bool has(COMM);
-            bool remove(COMM);
-            void dump();
-        private:
-            std::vector<COMM> m_store;
-            CommID m_counter;
-        };
-    }
-}
 
 namespace PWR_Router {
 
