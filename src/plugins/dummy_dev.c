@@ -158,7 +158,7 @@ static int dummy_dev_get_samples( pwr_fd_t fd, PWR_AttrName name,
 		DBGP("%f\n",((double*)buf)[i]);
 	}
 	*ts = getTime() - ( (*nSamples * period) * 1000000000);
-	DBGP("ts=%llu\n",*ts);
+	DBGP("ts=%ld\n", *ts);
 	return PWR_RET_SUCCESS;
 }
 
