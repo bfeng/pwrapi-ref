@@ -8,7 +8,7 @@ namespace RNET {
             printf("%s()\n", __func__);
         }
 
-        void initArgs(int argc, char* argv[], Args* args) {
+        void initArgs(int argc, char *argv[], Args *args) {
             int opt = 0;
             int long_index = 0;
 
@@ -35,7 +35,7 @@ namespace RNET {
             }
         }
 
-        RNETClient::RNETClient(int argc, char* argv[]) : m_chanSelect(NULL) {
+        RNETClient::RNETClient(int argc, char *argv[]) : m_chanSelect(NULL) {
             if (NULL != getenv("POWERAPI_DEBUG")) {
                 _DbgFlags = atoi(getenv("POWERAPI_DEBUG"));
             }
@@ -66,7 +66,7 @@ namespace RNET {
             delete m_commStore;
         }
 
-        void RNETClient::sendEvent(Event* ev) {
+        void RNETClient::sendEvent(Event *ev) {
             DBGX("\n");
             this->m_routerChannel->sendEvent(ev);
         }
@@ -93,8 +93,21 @@ namespace RNET {
             this->m_commStore->dump();
         }
 
+        void RNETClient::initCommunicator(std::string key, std::vector<PWR_Router::RouterID> rtrIDs) {
+            DBGX("\n");
+            int n = rtrIDs.size();
+
+            if (key == "WORLD" || n == 0) {
+                this->initWORLD();
+            } else {
+                PWR_Router::RouterID rtrs[n];
+                std::copy(rtrIDs.begin(), rtrIDs.end(), &rtrs[0]);
+                this->initCommunicator(key, rtrs, n);
+            }
+        }
+
         void RNETClient::initWORLD() {
-            this->initCommunicator("", NULL, 0);
+            this->initCommunicator("WORLD", NULL, 0);
         }
     }
 }

@@ -8,16 +8,16 @@
 #ifndef RNETCLIENT_H
 #define RNETCLIENT_H
 
-#include <stdlib.h>
-#include <vector>
-#include <event.h>
-#include <getopt.h>
 #include "debug.h"
 #include "eventChannel.h"
 #include "events.h"
+#include "rnetCommunicator.h"
 #include "router.h"
 #include "routerCore.h"
-#include "rnetCommunicator.h"
+#include <event.h>
+#include <getopt.h>
+#include <stdlib.h>
+#include <vector>
 
 namespace RNET {
     namespace POWERAPI {
@@ -28,21 +28,22 @@ namespace RNET {
         };
 
         class RNETClient : public EventGenerator {
-            public:
-                RNETClient(int, char* []);
-                RNETClient(std::string, std::string);
-                ~RNETClient();
-                void initWORLD();
-                void initCommunicator(std::string key, PWR_Router::RouterID rtrs[], unsigned int n);
-                void sendEvent(Event *ev);
-            private:
-                CommunicatorStore * m_commStore;
-                Args m_args;
-                ChannelSelect * m_chanSelect;
-                EventChannel * m_routerChannel;
+        public:
+            RNETClient(int, char *[]);
+            RNETClient(std::string, std::string);
+            ~RNETClient();
+            void sendEvent(Event *ev);
+            void initWORLD();
+            void initCommunicator(std::string key, PWR_Router::RouterID rtrs[], unsigned int n);
+            void initCommunicator(std::string key, std::vector<PWR_Router::RouterID> rtrIDs);
+            std::vector<PWR_Router::RouterID> lookupLeafs();
+        private:
+            CommunicatorStore *m_commStore;
+            Args m_args;
+            ChannelSelect *m_chanSelect;
+            EventChannel *m_routerChannel;
         };
     }
 }
 
 #endif /* RNETCLIENT_H */
-
