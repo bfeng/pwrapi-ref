@@ -37,7 +37,7 @@ namespace PWR_Router {
         void copyTo(RNETCommCreateEvent *ev);
         bool process(EventGenerator* _rtr, EventChannel* ec);
     private:
-        bool processImpl(Router rtr);
+        bool processForward(Router rtr);
     };
 }
 

@@ -12,8 +12,8 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include <debug.h> 
-#include "commCreateEvent.h" 
+#include <debug.h>
+#include "commCreateEvent.h"
 #include "router.h"
 #include "rnetClient.h"
 #include "treeCore.h"
@@ -29,7 +29,7 @@ bool RtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
 
     // for each object in a group
     for (unsigned int j = 0; j < members.size(); j++) {
-        // for each source of this object 
+        // for each source of this object
         for (unsigned int i = 0; i < members[j].size(); i++) {
             DBGX("%s\n", members[j][i].c_str());
 
@@ -57,7 +57,7 @@ void RNETRtrCommCreateEvent::copyTo(RNETCommCreateEvent* ev) {
     }
 }
 
-bool RNETRtrCommCreateEvent::processImpl(Router rtr) {
+bool RNETRtrCommCreateEvent::processForward(Router rtr) {
     if (0 == rtr.m_args.coreArgs->type.compare("tree")) {
         TreeArgs* args = static_cast<TreeArgs*> (rtr.m_args.coreArgs);
         // send to children
@@ -69,7 +69,7 @@ bool RNETRtrCommCreateEvent::processImpl(Router rtr) {
                 DBGX("Link=%s:%s\n", (*iter).otherHost.c_str(), (*iter).otherHostListenPort.c_str());
                 RNET::POWERAPI::RNETClient new_client((*iter).otherHost, (*iter).otherHostListenPort);
                 RNETCommCreateEvent* ev = new RNETCommCreateEvent();
-                copyTo(ev);
+                this->copyTo(ev);
                 new_client.sendEvent(ev);
                 delete ev;
             }
@@ -86,8 +86,18 @@ bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
 
     RNET::POWERAPI::COMM c = rtr.m_commStore->newCOMM(commID);
     c.name = commName;
+    c.label = RNET::POWERAPI::COMM_INT;
+    for (unsigned int i = 0; i < children.size(); ++i) {
+        if (rtr.m_args.rtrId == children[i]) {
+            c.label = RNET::POWERAPI::COMM_END;
+            break;
+        }
+    }
     rtr.m_commStore->put(c);
     rtr.m_commStore->dump();
 
-    return processImpl(rtr);
+    if (c.label == RNET::POWERAPI::COMM_END)
+        return true;
+
+    return processForward(rtr);
 }
