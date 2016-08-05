@@ -36,7 +36,7 @@ namespace RNET {
             void initWORLD();
             void initCommunicator(std::string key, PWR_Router::RouterID rtrs[], unsigned int n);
             void initCommunicator(std::string key, std::vector<PWR_Router::RouterID> rtrIDs);
-            std::vector<PWR_Router::RouterID> lookupLeafs();
+            std::vector<PWR_Router::RouterID> lookupLeaves();
         private:
             CommunicatorStore *m_commStore;
             Args m_args;
