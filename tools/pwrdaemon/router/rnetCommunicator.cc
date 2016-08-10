@@ -86,5 +86,16 @@ namespace RNET {
             buf << "}";
             DBGX("%s\n", buf.str().c_str());
         }
+        
+        std::string getLocalHost() {
+            char hostname[1024];
+            hostname[1023] = '\0';
+            int re = gethostname(hostname, 1023);
+            if(re == 0) {
+                return std::string(hostname);
+            } else {
+                return NULL;
+            }
+        }
     }
 }

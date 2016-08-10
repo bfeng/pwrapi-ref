@@ -10,6 +10,7 @@
 
 #include "debug.h"
 #include "events.h"
+#include "unistd.h"
 
 namespace RNET {
     namespace POWERAPI {
@@ -50,6 +51,8 @@ namespace RNET {
             std::vector<COMM> m_store;
             CommID m_counter;
         };
+        
+        std::string getLocalHost();
     }
 }
 
