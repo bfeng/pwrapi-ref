@@ -86,16 +86,38 @@ namespace RNET {
             buf << "}";
             DBGX("%s\n", buf.str().c_str());
         }
-        
+
         std::string getLocalHost() {
             char hostname[1024];
             hostname[1023] = '\0';
             int re = gethostname(hostname, 1023);
-            if(re == 0) {
+            if (re == 0) {
                 return std::string(hostname);
             } else {
                 return NULL;
             }
+        }
+
+        unsigned int getAvailablePort() {
+            struct sockaddr_in serv_addr;
+            unsigned int availablePort = 35000;
+            int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+            if (sockfd < 0) {
+                return -1;
+            }
+            while (1) {
+                bzero((char *) &serv_addr, sizeof (serv_addr));
+                serv_addr.sin_family = AF_INET;
+                serv_addr.sin_addr.s_addr = INADDR_ANY;
+                serv_addr.sin_port = htons(availablePort);
+                if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof (serv_addr)) < 0) {
+                    availablePort++;
+                    continue;
+                }
+                close(sockfd);
+                break;
+            }
+            return availablePort;
         }
     }
 }
