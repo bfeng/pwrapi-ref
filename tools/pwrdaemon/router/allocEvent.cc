@@ -61,6 +61,12 @@ Event* PWR_Router::allocClientEvent(unsigned int type, SerialBuf& buf) {
             return new RtrCommGetSamplesReqEvent(buf);
         case RNETCommCreate:
             return new RNETRtrCommCreateEvent(buf);
+        case RNETCommGetReq:
+            return new RNETRtrCommGetReqEvent(buf);
+        case RNETLookup:
+            return new RNETRtrLookupEvent(buf);
+        case RNETLookupResp:
+            return new RNETLookupRespEvent(buf);
     }
     return NULL;
 }
@@ -81,6 +87,8 @@ Event* PWR_Router::allocServerEvent(unsigned int type, SerialBuf& buf) {
             return new RtrCommGetSamplesRespEvent(buf);
         case ServerConnect:
             return new RtrServerConnectEvent(buf);
+        case RNETCommGetResp:
+            return new RNETRtrCommGetRespEvent(buf);
     }
     return NULL;
 }

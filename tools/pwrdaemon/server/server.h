@@ -40,6 +40,8 @@ namespace PWR_Server {
         void fini(Event*, Event* = NULL);
         void initFini(Event* key, Event*, EventChannel*);
         void freeFini(Event* key);
+        std::string getRouterHost();
+        std::string getRouterPort();
 
     private:
         ChannelSelect* m_chanSelect;

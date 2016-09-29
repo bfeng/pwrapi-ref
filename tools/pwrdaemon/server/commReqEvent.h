@@ -102,6 +102,27 @@ namespace PWR_Server {
         data->m_info->fini(data, &data->m_respEvent);
     }
 
+    class RNETSrvrCommGetReqEvent : public RNETCommGetReqEvent {
+    public:
+
+        RNETSrvrCommGetReqEvent(SerialBuf& buf) : RNETCommGetReqEvent(buf) {
+            DBGX("\n");
+        }
+
+        bool process(EventGenerator* gen, EventChannel* chan) {
+            Server& srvr = *static_cast<Server*> (gen);
+            DBGX("Event args:%s\n", args.c_str());
+            RNETCommGetRespEvent *ev = new RNETCommGetRespEvent();
+            ev->retval = "retval-in-comm-get-resp-power-data";
+            std::string config = "server=" + srvr.getRouterHost() + " serverPort=" + srvr.getRouterPort();
+            EventChannel *ec = getEventChannel("TCP", NULL, config, "server");
+            ec->sendEvent(ev);
+            delete ev;
+            delete ec;
+            return false;
+        }
+    };
+
 }
 
 #endif

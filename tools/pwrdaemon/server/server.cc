@@ -99,6 +99,13 @@ void Server::fini(Event* key, Event* payload) {
     m_finiMap.erase(key);
 }
 
+std::string Server::getRouterHost() {
+    return m_args.host;
+}
+
+std::string Server::getRouterPort() {
+    return m_args.port;
+}
 
 #include <getopt.h>
 

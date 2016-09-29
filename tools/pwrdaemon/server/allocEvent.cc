@@ -48,6 +48,8 @@ Event* PWR_Server::allocReqEvent(unsigned int type, SerialBuf& buf) {
             return new SrvrCommLogReqEvent(buf);
         case CommGetSamplesReq:
             return new SrvrCommGetSamplesReqEvent(buf);
+        case RNETCommGetReq:
+            return new RNETSrvrCommGetReqEvent(buf);
     }
     return NULL;
 }

@@ -83,6 +83,46 @@ namespace PWR_Router {
         }
     };
 
+    class RNETRtrCommGetReqEvent : public RNETCommGetReqEvent {
+    public:
+
+        RNETRtrCommGetReqEvent(SerialBuf &buf) : RNETCommGetReqEvent(buf) {
+            DBGX("\n");
+        }
+
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+            Router& rtr = *static_cast<Router*> (_rtr);
+            DBGX("RouterID:%" PRIu32 "\n", rtr.m_args.rtrId);
+            DBGX("Event args:%s\n", args.c_str());
+            RNETCommGetReqEvent* ev = new RNETCommGetReqEvent();
+            ev->args = args;
+
+            AppID appID = APP_ID(0, 0);
+            rtr.sendEvent(appID, ev);
+            return false;
+        }
+    };
+
+    class RNETRtrCommGetRespEvent : public RNETCommGetRespEvent {
+    public:
+
+        RNETRtrCommGetRespEvent(SerialBuf &buf) : RNETCommGetRespEvent(buf) {
+            DBGX("\n");
+        }
+
+        bool process(EventGenerator* _rtr, EventChannel* ec) {
+//            Router& rtr = *static_cast<Router*> (_rtr);
+            DBGX("Return value:%s\n", retval.c_str());
+            std::string config = "server=bfeng-HP-Z240-Tower-Workstation serverPort=55000";
+            EventChannel *evtChan = getEventChannel("TCP", NULL, config, "router");
+            RNETCommGetRespEvent *ev = new RNETCommGetRespEvent();
+            ev->retval = retval;
+            evtChan->sendEvent(ev);
+            delete ev;
+            return false;
+        }
+    };
+
 }
 
 #endif

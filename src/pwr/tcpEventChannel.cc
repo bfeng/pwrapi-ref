@@ -222,7 +222,7 @@ bool TcpEventChannel::sendEvent(Event* event) {
     print((unsigned char*) &length, nbytes);
 
     nbytes = write(m_fd, buf.addr(), buf.length());
-    assert(nbytes == buf.length());
+//    assert(nbytes == buf.length());
     print((unsigned char*) buf.addr(), nbytes);
 
     DBGX2(DBG_EC2, "%s event type %d, length=%lu \n", getName().c_str(),

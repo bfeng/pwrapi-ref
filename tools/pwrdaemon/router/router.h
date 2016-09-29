@@ -28,6 +28,7 @@
 #include "routerCore.h"
 #include "impTypes.h"
 #include "rnetCommunicator.h"
+#include "stdlib.h"
 
 typedef uint32_t ServerID;
 

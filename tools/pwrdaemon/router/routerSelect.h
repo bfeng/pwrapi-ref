@@ -13,6 +13,12 @@
 #define _ROUTER_SELECT_H
 
 #include "eventChannel.h"
+//
+//namespace RNET {
+//    namespace POWERAPI {
+//        class RNETClient;
+//    }
+//}
 
 namespace PWR_Router {
 
@@ -34,6 +40,7 @@ namespace PWR_Router {
         m_chan(chan), m_rtrChan(rtrChan) {
         }
         virtual bool process(ChannelSelect*, Router*) = 0;
+//        virtual bool processRNETClient(ChannelSelect*, RNET::POWERAPI::RNETClient*);
 
     protected:
         EventChannel* m_chan;

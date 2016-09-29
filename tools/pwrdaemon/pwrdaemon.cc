@@ -163,7 +163,7 @@ void findArgs(std::string prefix, int argc, char* argv[], Args& args) {
     prefix = "--" + prefix + ".";
     int len = prefix.size();
 
-    //printf("prefix=%s\n",prefix.c_str());
+    printf("prefix=%s\n",prefix.c_str());
     for (int i = 0; i < argc; i++) {
         if (0 == strncmp(argv[i], prefix.c_str(), len)) {
 

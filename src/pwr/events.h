@@ -17,6 +17,7 @@
 #include "pwrtypes.h"
 #include "impTypes.h"
 #include "event.h"
+#include "debug.h"
 
 typedef std::string ObjID;
 typedef uint64_t CommID;
@@ -128,6 +129,117 @@ struct RNETCommCreateEvent : public CommEvent {
         CommEvent::serialize_out(buf);
         buf << children;
         buf << commName;
+    }
+};
+
+struct RNETCommGetReqEvent : public CommEvent {
+
+    RNETCommGetReqEvent() : CommEvent(RNETCommGetReq) {
+        this->type = RNETCommGetReq;
+    }
+
+    RNETCommGetReqEvent(SerialBuf &buf) {
+        serialize_in(buf);
+    }
+    
+    std::string args;
+
+    virtual void serialize_in(SerialBuf &buf) {
+        buf >> args;
+        CommEvent::serialize_in(buf);
+    }
+
+    virtual void serialize_out(SerialBuf &buf) {
+        CommEvent::serialize_out(buf);
+        buf << args;
+    }
+};
+
+struct RNETCommGetRespEvent : public CommEvent {
+
+    RNETCommGetRespEvent() : CommEvent(RNETCommGetResp) {
+        this->type = RNETCommGetResp;
+    }
+
+    RNETCommGetRespEvent(SerialBuf &buf) {
+        serialize_in(buf);
+    }
+    
+    std::string retval;
+
+    virtual void serialize_in(SerialBuf &buf) {
+        buf >> retval;
+        CommEvent::serialize_in(buf);
+    }
+
+    virtual void serialize_out(SerialBuf &buf) {
+        CommEvent::serialize_out(buf);
+        buf << retval;
+    }
+};
+
+struct RNETLookupEvent : public CommEvent {
+
+    RNETLookupEvent() : CommEvent(RNETLookup) {
+        this->type = RNETLookup;
+    }
+
+    RNETLookupEvent(SerialBuf &buf) {
+        serialize_in(buf);
+    }
+
+    RNETLookupEvent(const RNETLookupEvent &x) : response(x.response) {
+    }
+
+    std::string host;
+
+    unsigned int port;
+
+    std::vector<RouterID> response;
+
+    virtual void serialize_in(SerialBuf &buf) {
+        buf >> host;
+        buf >> port;
+        buf >> response;
+        CommEvent::serialize_in(buf);
+    }
+
+    virtual void serialize_out(SerialBuf &buf) {
+        CommEvent::serialize_out(buf);
+        buf << response;
+        buf << port;
+        buf << host;
+    }
+};
+
+struct RNETLookupRespEvent : public CommEvent {
+
+    RNETLookupRespEvent() : CommEvent(RNETLookupResp) {
+        this->type = RNETLookupResp;
+    }
+
+    RNETLookupRespEvent(SerialBuf &buf) {
+        serialize_in(buf);
+    }
+
+    RNETLookupRespEvent(const RNETLookupRespEvent &x) : result(x.result) {
+    }
+
+    std::string result;
+
+    virtual void serilize_in(SerialBuf &buf) {
+        buf >> result;
+        CommEvent::serialize_in(buf);
+    }
+
+    virtual void serilize_out(SerialBuf &buf) {
+        CommEvent::serialize_out(buf);
+        buf << result;
+    }
+
+    bool process(EventGenerator *_rtr, EventChannel *ec) {
+        DBGX("\n");
+        return false;
     }
 };
 

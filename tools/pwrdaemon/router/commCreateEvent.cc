@@ -101,3 +101,29 @@ bool RNETRtrCommCreateEvent::process(EventGenerator* _rtr, EventChannel* ec) {
 
     return processForward(rtr);
 }
+
+bool RNETRtrLookupEvent::process(EventGenerator* _rtr, EventChannel* ec) {
+    Router& rtr = *static_cast<Router*> (_rtr);
+    DBGX("id=%"PRIx64"\n", commID);
+
+    //    for (std::vector<PWR_Router::RouterID>::iterator iter = response.begin(); iter != response.end(); ++iter) {
+    //        DBGX("RouterID=%d\n", (*iter));
+    //    }
+    DBGX("Sender=%s:%u\n", host.c_str(), port);
+    if (0 == rtr.m_args.coreArgs->type.compare("tree")) {
+        TreeArgs* args = static_cast<TreeArgs*> (rtr.m_args.coreArgs);
+        // send to children
+        if (!args->isLeaf) {
+            for (std::vector<Link>::iterator iter = args->links.begin(); iter != args->links.end(); ++iter) {
+                RNET::POWERAPI::RNETClient new_client((*iter).otherHost, (*iter).otherHostListenPort);
+                new_client.queryAndWait();
+            }
+        }
+        RNET::POWERAPI::RNETClient rnet_client(host, port);
+        Event *ev = new Event(RNETLookupResp);
+        rnet_client.sendEvent(ev);
+        delete ev;
+    }
+
+    return false;
+}

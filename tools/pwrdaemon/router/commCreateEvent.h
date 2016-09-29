@@ -39,6 +39,15 @@ namespace PWR_Router {
     private:
         bool processForward(Router rtr);
     };
+
+    class RNETRtrLookupEvent : public RNETLookupEvent {
+    public:
+
+        RNETRtrLookupEvent(SerialBuf &buf) : RNETLookupEvent(buf) {
+            DBGX("\n");
+        }
+        bool process(EventGenerator *_rtr, EventChannel *ec);
+    };
 }
 
 #endif

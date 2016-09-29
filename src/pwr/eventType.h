@@ -26,6 +26,11 @@
     NAME(Router2Router) \
     NAME(RNETCommCreate) \
     NAME(RNETRouter2Router) \
+    NAME(RNETCommGetReq) \
+    NAME(RNETCommGetResp) \
+    NAME(RNETLookup) \
+    NAME(RNETLookupResp) \
+    NAME(RNETRtrReturn)
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,

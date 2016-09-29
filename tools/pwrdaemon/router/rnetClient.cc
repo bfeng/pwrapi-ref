@@ -4,6 +4,12 @@ namespace RNET {
 
     namespace POWERAPI {
 
+#ifdef USE_DEBUG
+        static const char* _eventNames[] = {
+            FOREACH_ENUM(GENERATE_STRING)
+        };
+#endif
+
         static void print_usage() {
             printf("%s()\n", __func__);
         }
@@ -35,21 +41,44 @@ namespace RNET {
             }
         }
 
+        Event* allocRNETClientEvent(unsigned int type, SerialBuf& buf) {
+            DBG4("PWR_Router", "`%s`\n", _eventNames[type]);
+
+            switch (type) {
+                default:
+                    assert(0);
+                case RNETLookupResp:
+                    return new RNETLookupRespEvent(buf);
+                case RNETRtrReturn:
+                    return new RNETRtrReturnEvent(buf);
+            }
+        }
+
         RNETClient::RNETClient(int argc, char *argv[]) : m_chanSelect(NULL) {
             if (NULL != getenv("POWERAPI_DEBUG")) {
                 _DbgFlags = atoi(getenv("POWERAPI_DEBUG"));
             }
             DBGX("\n");
             initArgs(argc, argv, &m_args);
-            DBGX("routerHost=%s routerPort=%s\n", m_args.routerHost.c_str(), m_args.routerPort.c_str());
-            this->m_chanSelect = getChannelSelect("TCP");
-            std::string config = "server=" + m_args.routerHost + " serverPort=" + m_args.routerPort;
-            DBGX("config:%s\n", config.c_str());
-            this->m_routerChannel = getEventChannel("TCP", NULL, config, "router");
-            m_commStore = new CommunicatorStore();
+            init(m_args.routerHost, m_args.routerPort);
         }
 
         RNETClient::RNETClient(std::string host, std::string port) : m_chanSelect(NULL) {
+            init(host, port);
+        }
+
+        RNETClient::RNETClient(std::string host, unsigned int port) : m_chanSelect(NULL) {
+            std::ostringstream oss;
+            oss << port;
+            init(host, oss.str());
+        }
+
+        RNETClient::~RNETClient() {
+            DBGX("\n");
+            delete m_commStore;
+        }
+
+        void RNETClient::init(std::string host, std::string port) {
             DBGX("\n");
             m_args.routerHost = host;
             m_args.routerPort = port;
@@ -59,15 +88,12 @@ namespace RNET {
             DBGX("config:%s\n", config.c_str());
             this->m_routerChannel = getEventChannel("TCP", NULL, config, "router");
             m_commStore = new CommunicatorStore();
-        }
-
-        RNETClient::~RNETClient() {
-            DBGX("\n");
-            delete m_commStore;
+            this->m_eventCounter = 0;
         }
 
         void RNETClient::sendEvent(Event *ev) {
             DBGX("\n");
+            ev->id = this->m_eventCounter++;
             this->m_routerChannel->sendEvent(ev);
         }
 
@@ -108,6 +134,68 @@ namespace RNET {
 
         void RNETClient::initWORLD() {
             this->initCommunicator("WORLD", NULL, 0);
+        }
+
+        void RNETClient::waitFor() {
+            std::ostringstream configStream;
+//            configStream << "server=";
+//            configStream << getLocalHost();
+//            configStream << " serverPort=";
+            configStream << "listenPort=";
+            configStream << 55000; // getAvailablePort();
+            
+            DBGX("%s\n", configStream.str().c_str());
+
+            EventChannel *rtrChan = getEventChannel("TCP", allocRNETClientEvent, configStream.str(), "rnet-client");
+            ChannelSelect *chanSelect = getChannelSelect("TCP");
+            chanSelect->addChannel(rtrChan, new RNETRouterData(rtrChan));
+
+            PWR_Router::SelectData* data;
+            if ((data = static_cast<PWR_Router::SelectData*> (chanSelect->wait()))) {
+                DBGX("Got a reply\n");
+                delete data;
+            }
+        }
+
+        void RNETClient::queryAndWait() {
+            std::string host = getLocalHost();
+            unsigned int port = getAvailablePort();
+            DBGX("%s:%u\n", host.c_str(), port);
+            RNETLookupEvent *ev = new RNETLookupEvent();
+            ev->response.push_back(0);
+            ev->host = host;
+            ev->port = port;
+            this->sendEvent(ev);
+            delete ev;
+
+            std::ostringstream oss;
+            oss << "listenPort=";
+            oss << port;
+
+            RNETChan chan;
+            EventChannel *channel = getEventChannel("TCP", allocRNETClientEvent, oss.str(), "client-listen");
+            ChannelSelect *channelSelect = getChannelSelect("TCP");
+            channelSelect->addChannel(channel, new PWR_Router::AcceptData<PWR_Router::EventData>(channel, &chan));
+
+            PWR_Router::SelectData* data;
+
+            DBGX("Waiting for replies\n");
+            if ((data = static_cast<PWR_Router::SelectData*> (channelSelect->wait()))) {
+                DBGX("Got a reply\n");
+                //                if (data->process(channelSelect, NULL)) {
+                //                    DBGX("reply processed\n");
+                //                    delete data;
+                //                }
+            }
+
+            delete channel;
+            //delete channelSelect;
+        }
+
+        std::vector<PWR_Router::RouterID> RNETClient::lookupLeaves(std::vector<PWR_Router::RouterID> rtrIDs) {
+            std::vector<PWR_Router::RouterID> response;
+            this->queryAndWait();
+            return response;
         }
     }
 }
